@@ -605,9 +605,19 @@
                                 <h3 class="text-sm font-bold text-white flex items-center gap-2">
                                     <i class="fa-solid fa-id-badge text-red-500"></i> Owner-Managed Team Keys & Usage Analytics
                                 </h3>
+                            <div class="flex items-center gap-2">
+                                <button onclick="exportTeamKeys()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-4 py-2 rounded-xl text-xs font-medium transition-all flex items-center gap-1.5">
+                                    <i class="fa-solid fa-file-export"></i> Export Team Keys
+                                </button>
                                 <button onclick="generateTeamKey()" class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white px-4 py-2 rounded-xl text-xs font-medium transition-all shadow-lg shadow-red-600/20">
                                     Generate Named Team Key
                                 </button>
+                            </div>
+                            </div>
+                            <div class="bg-slate-950 border border-slate-800/80 rounded-xl p-3 text-[11px] text-slate-400 leading-relaxed">
+                                <strong class="text-slate-300">Static site, no backend:</strong> a new key only works in this browser at first.
+                                <span class="text-emerald-400 font-semibold">① Export Team Keys</span> → paste into <code class="font-mono text-red-300">EMBEDDED_TEAM_KEYS</code> in the source → commit & push to GitHub, so everyone can use your one shared link and type in their own key, permanently.
+                                <span class="text-blue-400 font-semibold">② Copy Invite Link</span> (per row below) → works instantly on any device, no redeploy needed, but only for that one key.
                             </div>
                             <div class="overflow-x-auto">
                                 <table class="w-full text-left text-xs font-mono">
@@ -662,6 +672,29 @@
 
     <!-- JAVASCRIPT ENGINE -->
     <script>
+        // ============================================================================
+        // OWNER: EMBEDDED TEAM KEYS — the single source of truth for every visitor.
+        // This is a static site with no backend/database, so a key generated in the
+        // Owner tab only lives in YOUR browser's localStorage until you export it and
+        // paste it here, then commit & push index.html to GitHub. Once that's done,
+        // every device opening your one shared GitHub Pages link will recognize these
+        // keys immediately when typed in — no per-person invite links required.
+        // Use "Export Team Keys" in the Owner & API Control tab to regenerate this list.
+        // ============================================================================
+        const EMBEDDED_TEAM_KEYS = [
+            // { key: "ADAM-TEAM-ZRBT6C", name: "Jane Doe", role: "Senior DBA Team Member", requests: 0, active: true },
+        ];
+
+        function mergeTeamKeys() {
+            const stored = JSON.parse(localStorage.getItem('adam_team_keys') || '[]');
+            const map = new Map();
+            EMBEDDED_TEAM_KEYS.forEach(k => map.set(k.key, { ...k }));
+            // Locally generated/updated keys (this browser) take precedence, so the
+            // owner's own testing browser stays in sync with anything not yet embedded.
+            stored.forEach(k => map.set(k.key, { ...(map.get(k.key) || {}), ...k }));
+            return Array.from(map.values());
+        }
+
         // State Management
         let appState = {
             role: null, // 'owner' or 'team'
@@ -671,7 +704,7 @@
             geminiKey: localStorage.getItem('adam_gemini_key') || '',
             groqKey: localStorage.getItem('adam_groq_key') || '',
             targetDb: localStorage.getItem('adam_target_db') || null,
-            teamKeys: JSON.parse(localStorage.getItem('adam_team_keys') || '[]'),
+            teamKeys: mergeTeamKeys(),
             rcaArchive: JSON.parse(localStorage.getItem('adam_rca_archive') || '[]'),
             currentRu: localStorage.getItem('adam_current_ru') || '',
             chatHistory: [],
@@ -1320,6 +1353,23 @@
             }
         }
 
+        // Copies the current team key list as ready-to-paste JS. Paste it over the
+        // EMBEDDED_TEAM_KEYS array near the top of the <script>, then commit & push
+        // to GitHub. After that, everyone can use your ONE shared site link and type
+        // in their own individual key — no per-person invite links needed.
+        function exportTeamKeys() {
+            if (appState.teamKeys.length === 0) {
+                alert('No team keys to export yet. Generate one first.');
+                return;
+            }
+            const entries = appState.teamKeys.map(k =>
+                `    { key: "${k.key}", name: "${String(k.name).replace(/"/g, '\\"')}", role: "${k.role || 'Senior DBA Team Member'}", requests: 0, active: ${k.active} },`
+            ).join('\n');
+            const code = `const EMBEDDED_TEAM_KEYS = [\n${entries}\n];`;
+            navigator.clipboard.writeText(code);
+            alert('Team key list copied!\n\nPaste this over the EMBEDDED_TEAM_KEYS array near the top of the <script> in index.html, then commit & push to GitHub Pages.\n\nOnce deployed, everyone can open your single shared link and type in their own key from any device — no invite links needed.');
+        }
+
         function generateTeamKey() {
             const name = prompt("Enter team member's full name:");
             if (!name) return;
@@ -1327,6 +1377,52 @@
             appState.teamKeys.push({ key: newKey, name: name, role: 'Senior DBA Team Member', requests: 0, active: true });
             saveState();
             renderTeamKeysTable();
+            const shareNow = confirm(`Key generated for ${name}: ${newKey}\n\nThis key only works on THIS browser until you export it and redeploy to GitHub (click OK to copy an instant cross-device invite link instead, or Cancel to export later via "Export Team Keys").`);
+            if (shareNow) copyInviteLink(newKey, name);
+        }
+
+        // Team keys live only in this browser's localStorage (there is no backend),
+        // so a key typed on another device will never match here. An invite link
+        // carries the key itself, so opening it logs the team member in directly
+        // regardless of device or browser.
+        function copyInviteLink(key, name) {
+            const link = `${window.location.origin}${window.location.pathname}?key=${encodeURIComponent(key)}&name=${encodeURIComponent(name)}`;
+            navigator.clipboard.writeText(link);
+            alert(`Invite link copied for ${name}!\n\nSend this link (not just the raw key) — opening it logs them in directly, even on a different device or browser:\n\n${link}`);
+        }
+
+        function copyTeamKeyOnly(key) {
+            navigator.clipboard.writeText(key);
+            alert('Key copied to clipboard! Note: typing this key in only works on THIS browser — use "Copy Invite Link" to share access across devices.');
+        }
+
+        // If this page was opened via an invite link (?key=...), authenticate the
+        // team member directly using the key from the URL, instead of requiring a
+        // local match against this browser's team-key list.
+        function checkInviteLink() {
+            const params = new URLSearchParams(window.location.search);
+            const inviteKey = params.get('key');
+            if (!inviteKey) return false;
+
+            const inviteName = params.get('name') ? decodeURIComponent(params.get('name')) : 'Invited Team Member';
+            appState.role = 'team';
+            appState.currentKey = inviteKey;
+            appState.currentName = inviteName;
+
+            let found = appState.teamKeys.find(k => k.key === inviteKey);
+            if (!found) {
+                found = { key: inviteKey, name: inviteName, role: 'Senior DBA Team Member', requests: 0, active: true };
+                appState.teamKeys.push(found);
+            }
+            found.active = true;
+            found.requests = (found.requests || 0) + 1;
+            saveState();
+
+            // Scrub the key out of the visible URL/history once it's been used.
+            window.history.replaceState({}, document.title, window.location.origin + window.location.pathname);
+
+            startApp();
+            return true;
         }
 
         function revokeTeamKey(idx) {
@@ -1348,7 +1444,12 @@
                     <td class="py-3 px-3">${k.requests || 0}</td>
                     <td class="py-3 px-3">${(k.requests || 0) * 450} tokens</td>
                     <td class="py-3 px-3 text-right">
-                        ${k.active ? `<button onclick="revokeTeamKey(${idx})" class="text-red-400 hover:text-red-300">Revoke</button>` : '<span class="text-slate-500">Revoked</span>'}
+                        ${k.active ? `
+                        <div class="flex items-center justify-end gap-3">
+                            <button onclick="copyInviteLink('${k.key}', '${String(k.name).replace(/'/g, "\\'")}')" class="text-blue-400 hover:text-blue-300" title="Copy shareable invite link (works on any device)"><i class="fa-solid fa-link"></i></button>
+                            <button onclick="copyTeamKeyOnly('${k.key}')" class="text-slate-400 hover:text-white" title="Copy raw key (this browser only)"><i class="fa-regular fa-copy"></i></button>
+                            <button onclick="revokeTeamKey(${idx})" class="text-red-400 hover:text-red-300">Revoke</button>
+                        </div>` : '<span class="text-slate-500">Revoked</span>'}
                     </td>
                 </tr>
             `).join('');
@@ -1368,6 +1469,9 @@
             localStorage.setItem('adam_team_keys', JSON.stringify(appState.teamKeys));
             localStorage.setItem('adam_rca_archive', JSON.stringify(appState.rcaArchive));
         }
+
+        // Auto-login if this page was opened via a team invite link.
+        checkInviteLink();
     </script>
 </body>
 </html>
