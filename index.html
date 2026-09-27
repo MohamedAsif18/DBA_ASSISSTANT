@@ -28,7 +28,7 @@
         ::-webkit-scrollbar-thumb:hover { background: #475569; }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-red-500 selection:text-white">
+<body id="app-body" class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-red-500 selection:text-white transition-colors duration-500">
 
     <!-- AUTHENTICATION SCREEN -->
     <div id="auth-screen" class="fixed inset-0 z-50 bg-slate-950 flex items-center justify-center p-4">
@@ -68,6 +68,16 @@
 
     <!-- MAIN APP WRAPPER -->
     <div id="app-wrapper" class="hidden flex-col min-h-screen">
+        
+        <!-- RATE LIMIT EXCEEDED WARNING BANNER -->
+        <div id="rate-limit-banner" class="hidden bg-amber-500/20 border-b border-amber-500/40 px-6 py-2.5 flex items-center justify-between text-xs text-amber-300 font-mono z-50">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-triangle-exclamation text-amber-400 animate-bounce text-sm"></i>
+                <span><strong>WARNING:</strong> API key limits exceeded on both Gemini and Groq! Key limit will refresh in <span id="rate-limit-countdown" class="font-bold underline">60</span>s. Note: Responses may give inaccurate answers during offline fallback mode.</span>
+            </div>
+            <span class="text-[10px] bg-amber-500/30 px-2 py-0.5 rounded text-amber-200">Rate Limited</span>
+        </div>
+
         <!-- HEADER -->
         <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-40 px-6 py-3 flex items-center justify-between">
             <div class="flex items-center gap-4">
@@ -78,7 +88,7 @@
                     <div>
                         <div class="flex items-center gap-2">
                             <span class="font-bold text-base tracking-tight text-white">A.D.A.M</span>
-                            <span class="bg-red-500/10 text-red-400 border border-red-500/20 text-[10px] font-semibold px-2 py-0.5 rounded-full">Enterprise v5.2</span>
+                            <span class="bg-red-500/10 text-red-400 border border-red-500/20 text-[10px] font-semibold px-2 py-0.5 rounded-full">Enterprise v5.3</span>
                         </div>
                         <div class="text-[11px] text-slate-400 flex items-center gap-1.5">
                             <span>Automated Database Analysis & Monitoring (Multi-API Hybrid Engine)</span>
@@ -584,7 +594,10 @@
             rcaArchive: JSON.parse(localStorage.getItem('adam_rca_archive') || '[]'),
             chatHistory: [],
             attachedFileContent: null,
-            attachedFileName: null
+            attachedFileName: null,
+            rateLimited: false,
+            rateLimitCountdown: 0,
+            rateLimitTimer: null
         };
 
         // Authentication Handler
@@ -717,11 +730,38 @@
             document.getElementById('chat-file-input').value = '';
         }
 
-        // AI Multi-API Router with Automatic Failover
+        // Trigger Rate Limit Visual State
+        function triggerRateLimitWarning() {
+            if (appState.rateLimited) return;
+            appState.rateLimited = true;
+            appState.rateLimitCountdown = 60; // 60 seconds cooldown timer
+            
+            // Change background tint to warning amber/red
+            document.getElementById('app-body').classList.add('bg-amber-950/30');
+            document.getElementById('rate-limit-banner').classList.remove('hidden');
+
+            if (appState.rateLimitTimer) clearInterval(appState.rateLimitTimer);
+            appState.rateLimitTimer = setInterval(() => {
+                appState.rateLimitCountdown--;
+                const countEl = document.getElementById('rate-limit-countdown');
+                if (countEl) countEl.innerText = appState.rateLimitCountdown;
+
+                if (appState.rateLimitCountdown <= 0) {
+                    clearInterval(appState.rateLimitTimer);
+                    appState.rateLimited = false;
+                    document.getElementById('app-body').classList.remove('bg-amber-950/30');
+                    document.getElementById('rate-limit-banner').classList.add('hidden');
+                }
+            }, 1000);
+        }
+
+        // AI Multi-API Router with Automatic Failover & Limit Warning
         async function callAiEngine(prompt, systemInstruction = "") {
             trackUsage();
+            let geminiFailed = false;
+            let groqFailed = false;
             
-            // Try Gemini First if configured (using stable gemini-3.8-flash)
+            // Try Gemini First if configured
             if (appState.geminiKey) {
                 try {
                     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${appState.geminiKey}`, {
@@ -735,10 +775,14 @@
                         const data = await res.json();
                         const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
                         if (text) return { text, provider: 'Gemini (3.8 Flash)' };
+                    } else if (res.status === 429) {
+                        geminiFailed = true;
                     }
                 } catch (e) {
-                    console.warn('Gemini API call failed, failing over to Groq...', e);
+                    geminiFailed = true;
                 }
+            } else {
+                geminiFailed = true;
             }
 
             // Fallback to Groq if configured
@@ -751,7 +795,7 @@
                             'Authorization': `Bearer ${appState.groqKey}`
                         },
                         body: JSON.stringify({
-                            model: 'llama-3.3-70b-versatile',
+                            model: 'llama-3.1-70b-versatile',
                             messages: [
                                 { role: 'system', content: systemInstruction || 'You are A.D.A.M, an expert Oracle Database Administrator assistant.' },
                                 { role: 'user', content: prompt }
@@ -761,15 +805,24 @@
                     if (res.ok) {
                         const data = await res.json();
                         const text = data.choices?.[0]?.message?.content;
-                        if (text) return { text, provider: 'Groq (Llama 3.3 70B)' };
+                        if (text) return { text, provider: 'Groq (Llama 3.1 70B)' };
+                    } else if (res.status === 429) {
+                        groqFailed = true;
                     }
                 } catch (e) {
-                    console.warn('Groq API call failed...', e);
+                    groqFailed = true;
                 }
+            } else {
+                groqFailed = true;
+            }
+
+            // If BOTH APIs failed or hit rate limits, trigger warning background & countdown
+            if (geminiFailed && groqFailed) {
+                triggerRateLimitWarning();
             }
 
             // Offline Expert Failover Fallback
-            return { text: getOfflineExpertResponse(prompt), provider: 'A.D.A.M Offline Expert Engine' };
+            return { text: getOfflineExpertResponse(prompt), provider: 'A.D.A.M Offline Expert Engine (Warning: May give approximate answers)' };
         }
 
         function getOfflineExpertResponse(prompt) {
@@ -781,7 +834,7 @@
             } else if (p.includes('lock') || p.includes('blocking')) {
                 return `SELECT l1.sid blocker_sid, l2.sid waiter_sid FROM v$lock l1, v$lock l2 WHERE l1.block = 1 AND l2.request > 0 AND l1.id1 = l2.id1;`;
             }
-            return `--- A.D.A.M EXPERT GUIDED STEP ---\n1. Inspect Alert Log for ORA- errors.\n2. Run ASH / AWR reports to isolate contention points.\n3. Apply Oracle 19.33 RU patch if affected by known bug.`;
+            return `--- A.D.A.M EXPERT GUIDED STEP (OFFLINE FALLBACK) ---\n1. Inspect Alert Log for ORA- errors.\n2. Run ASH / AWR reports to isolate contention points.\n3. Apply Oracle 19.33 RU patch if affected by known bug.`;
         }
 
         // Query Assistant Functions
@@ -999,7 +1052,7 @@
                     const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${appState.groqKey}` },
-                        body: JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: [{ role: 'user', content: 'Ping test' }] })
+                        body: JSON.stringify({ model: 'llama-3.1-70b-versatile', messages: [{ role: 'user', content: 'Ping test' }] })
                     });
                     groqStatus = r.ok ? 'SUCCESS (Connected)' : `FAILED (HTTP ${r.status})`;
                 } catch(e) { groqStatus = 'ERROR (Invalid Key or Network)'; }
