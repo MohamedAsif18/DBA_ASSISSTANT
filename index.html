@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oracle DBA Assistant — Enterprise Operations & Learning Platform</title>
+    <title>A.D.A.M - Automated Database Analysis & Monitoring</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -12,7 +12,7 @@
             theme: {
                 extend: {
                     colors: {
-                        oracle: {
+                        adam: {
                             red: '#CC0000',
                             darkred: '#990000',
                             lightred: '#FF3333',
@@ -43,7 +43,7 @@
         ::-webkit-scrollbar-thumb:hover { background: #475569; }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 font-sans antialiased min-h-screen flex flex-col" x-data="dbaApp()">
+<body class="bg-slate-950 text-slate-100 font-sans antialiased min-h-screen flex flex-col" x-data="adamApp()">
 
     <!-- AUTHENTICATION GATE -->
     <div x-show="!authenticated" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4">
@@ -52,24 +52,25 @@
                 <div class="w-14 h-14 bg-red-600 rounded-2xl mx-auto flex items-center justify-center text-white text-2xl font-bold shadow-lg shadow-red-900/50">
                     <i class="fa-solid fa-shield-halved"></i>
                 </div>
-                <h2 class="text-xl font-bold text-white">Oracle DBA Assistant Security Gate</h2>
-                <p class="text-xs text-slate-400">Enterprise Access Control — Platform Owner: Mohamed Asif</p>
+                <h2 class="text-xl font-bold text-white">A.D.A.M Access Gate</h2>
+                <p class="text-xs text-slate-400">Automated Database Analysis & Monitoring Platform</p>
+                <p class="text-[10px] text-slate-500 font-medium">by mohamed asif</p>
             </div>
 
             <div class="space-y-4">
                 <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl text-xs space-y-2">
-                    <p class="text-slate-300 font-medium">Access Instructions:</p>
-                    <p class="text-slate-400">• Owner Master Code: <code class="text-red-400 font-mono">ASIF-OWNER-2026</code></p>
-                    <p class="text-slate-400">• Team Members: Enter the private random key issued personally by Mohamed Asif.</p>
+                    <p class="text-slate-300 font-medium">Authentication Instructions:</p>
+                    <p class="text-slate-400">• Owner: Enter your Master Owner Password.</p>
+                    <p class="text-slate-400">• Team Member: Enter the secure team key issued personally by Mohamed Asif.</p>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Enter Access Key or Owner Code</label>
-                    <input type="password" x-model="enteredKey" @keydown.enter="authenticateUser()" placeholder="Enter key..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-red-500">
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Enter Password or Team Key</label>
+                    <input type="password" x-model="enteredKey" @keydown.enter="authenticateUser()" placeholder="Enter key or password..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-red-500">
                 </div>
 
                 <button @click="authenticateUser()" class="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl font-semibold text-sm shadow-lg shadow-red-600/30 transition-all">
-                    Authenticate & Enter Platform
+                    Authenticate & Enter A.D.A.M
                 </button>
             </div>
         </div>
@@ -93,25 +94,29 @@
     <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-40 flex items-center justify-between px-6 py-3 shadow-md">
         <div class="flex items-center space-x-3">
             <div class="bg-red-600 p-2.5 rounded-xl shadow-lg shadow-red-900/30 flex items-center justify-center text-white font-bold text-xl">
-                <i class="fa-solid fa-database"></i>
+                <i class="fa-solid fa-robot"></i>
             </div>
             <div>
                 <div class="flex items-center space-x-2">
-                    <h1 class="font-bold text-lg text-white tracking-wide">Oracle DBA Assistant</h1>
-                    <span class="bg-red-500/10 text-red-400 border border-red-500/30 text-xs px-2 py-0.5 rounded-full font-medium">Enterprise v3.9 (by mohamed asif)</span>
+                    <h1 class="font-bold text-lg text-white tracking-wide">A.D.A.M</h1>
+                    <span class="bg-red-500/10 text-red-400 border border-red-500/30 text-xs px-2 py-0.5 rounded-full font-medium">Enterprise v5.0</span>
                 </div>
-                <p class="text-xs text-slate-400">Operations, Guided Investigations & Learning Platform</p>
+                <div class="flex items-center space-x-1.5">
+                    <p class="text-[11px] text-slate-400">Automated Database Analysis & Monitoring (Multi-API Hybrid Engine)</p>
+                    <span class="text-slate-600">•</span>
+                    <span class="text-[10px] text-slate-500 font-medium">by mohamed asif</span>
+                </div>
             </div>
         </div>
 
-        <div class="flex items-center space-x-4">
+        <div class="flex items-center space-x-3">
             <div class="hidden md:flex items-center space-x-3 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800 text-xs">
                 <div class="flex items-center space-x-1.5">
                     <span class="w-2 h-2 rounded-full" :class="dbConfigured ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'"></span>
                     <span class="text-slate-300 font-mono" x-text="dbConfigured ? dbName + ' (' + oracleVersion + ')' : 'No DB Configured'"></span>
                 </div>
                 <span class="text-slate-700">|</span>
-                <span class="text-slate-400">User: <strong class="text-red-400" x-text="currentUserRole"></strong></span>
+                <span class="text-slate-400">Role: <strong class="text-red-400" x-text="currentUserRole"></strong></span>
             </div>
             
             <button @click="activeTab = 'safety'" class="hidden sm:flex items-center space-x-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-lg text-xs font-medium transition-all">
@@ -120,8 +125,13 @@
             </button>
 
             <button @click="activeTab = 'chat'" class="bg-red-600 hover:bg-red-700 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold shadow-md shadow-red-600/20 flex items-center space-x-1.5 transition-all">
-                <i class="fa-solid fa-robot"></i>
-                <span>Ask DBA AI</span>
+                <i class="fa-solid fa-comments"></i>
+                <span>Ask A.D.A.M</span>
+            </button>
+
+            <button @click="logout()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-700 transition-all flex items-center space-x-1">
+                <i class="fa-solid fa-right-from-bracket text-red-400"></i>
+                <span>Logout</span>
             </button>
         </div>
     </header>
@@ -134,7 +144,6 @@
                 <div class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider px-3 mb-2">Main Navigation</div>
                 
                 <template x-for="item in navigation" :key="item.id">
-                    <!-- Hide owner panel if not owner -->
                     <template x-if="item.id !== 'owner' || isOwner">
                         <button @click="activeTab = item.id"
                             :class="activeTab === item.id ? 'bg-red-600 text-white shadow-lg shadow-red-900/30 font-medium' : 'text-slate-300 hover:bg-slate-800 hover:text-white'"
@@ -174,7 +183,7 @@
                         <p class="text-xs font-semibold text-white truncate" x-text="currentUserRole"></p>
                         <p class="text-[10px] text-emerald-400 flex items-center space-x-1">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                            <span>Authenticated Session</span>
+                            <span>Gemini ⇄ Groq Hybrid Active</span>
                         </p>
                     </div>
                 </div>
@@ -189,20 +198,20 @@
                 <div class="bg-gradient-to-r from-slate-900 via-slate-900 to-red-950/40 border border-slate-800 p-6 rounded-2xl shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
                         <div class="flex items-center space-x-2 mb-1">
-                            <span class="bg-red-500/20 text-red-400 text-xs px-2.5 py-0.5 rounded-full font-semibold">Oracle DBA Enterprise Center</span>
-                            <span class="text-slate-400 text-xs">Created by Mohamed Asif</span>
+                            <span class="bg-red-500/20 text-red-400 text-xs px-2.5 py-0.5 rounded-full font-semibold">A.D.A.M Enterprise Center</span>
+                            <span class="text-slate-400 text-xs">Created by mohamed asif</span>
                         </div>
                         <h2 class="text-2xl md:text-3xl font-bold text-white tracking-tight" x-text="'Welcome, ' + currentUserRole + '.'"></h2>
-                        <p class="text-slate-400 text-sm mt-1">Configure your target database environment or start investigating issues with the live AI DBA assistant.</p>
+                        <p class="text-slate-400 text-sm mt-1">Configure your target database environment or start investigating issues with the live multi-API hybrid engine.</p>
                     </div>
                     <div class="flex flex-wrap gap-2">
                         <button @click="activeTab = 'investigation'" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-lg shadow-red-600/30 flex items-center space-x-2 transition-all">
                             <i class="fa-solid fa-stethoscope"></i>
                             <span>Start Guided Investigation</span>
                         </button>
-                        <button @click="activeTab = 'query'" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-4 py-2 rounded-xl text-sm font-medium transition-all flex items-center space-x-2">
-                            <i class="fa-solid fa-terminal"></i>
-                            <span>Query Assistant</span>
+                        <button @click="activeTab = 'rca_archive'" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-lg shadow-indigo-600/30 transition-all flex items-center space-x-2">
+                            <i class="fa-solid fa-box-archive"></i>
+                            <span>RCA Archive (<span x-text="rcaArchive.length"></span>)</span>
                         </button>
                     </div>
                 </div>
@@ -262,7 +271,7 @@
                                 <i class="fa-solid fa-magnifying-glass"></i>
                             </div>
                             <h4 class="font-semibold text-white group-hover:text-red-400 transition-colors">Query Assistant</h4>
-                            <p class="text-xs text-slate-400 mt-1">Natural language to Oracle SQL, column definitions & safety checks.</p>
+                            <p class="text-xs text-slate-400 mt-1">Instant Oracle SQL, column definitions & safety checks.</p>
                         </div>
 
                         <div @click="activeTab = 'investigation'" class="bg-slate-900 hover:bg-slate-800/80 border border-slate-800 hover:border-red-500/50 p-5 rounded-2xl cursor-pointer transition-all group shadow-sm">
@@ -281,12 +290,12 @@
                             <p class="text-xs text-slate-400 mt-1">Architecture, SGA/PGA memory, wait events, locks & tuning guide.</p>
                         </div>
 
-                        <div @click="activeTab = 'safety'" class="bg-slate-900 hover:bg-slate-800/80 border border-slate-800 hover:border-red-500/50 p-5 rounded-2xl cursor-pointer transition-all group shadow-sm">
-                            <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center font-bold text-lg mb-3 group-hover:scale-110 transition-transform">
-                                <i class="fa-solid fa-shield-halved"></i>
+                        <div @click="activeTab = 'rca_archive'" class="bg-slate-900 hover:bg-slate-800/80 border border-slate-800 hover:border-red-500/50 p-5 rounded-2xl cursor-pointer transition-all group shadow-sm">
+                            <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center font-bold text-lg mb-3 group-hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-box-archive"></i>
                             </div>
-                            <h4 class="font-semibold text-white group-hover:text-amber-400 transition-colors">Command Safety Checker</h4>
-                            <p class="text-xs text-slate-400 mt-1">Evaluate SQL impact before execution on production databases.</p>
+                            <h4 class="font-semibold text-white group-hover:text-purple-400 transition-colors">Saved RCA Archive</h4>
+                            <p class="text-xs text-slate-400 mt-1">Review, export, and manage all previously completed incident RCAs.</p>
                         </div>
                     </div>
                 </div>
@@ -298,9 +307,9 @@
                     <div>
                         <h2 class="text-2xl font-bold text-white tracking-tight flex items-center space-x-2">
                             <i class="fa-solid fa-magnifying-glass text-red-500"></i>
-                            <span>Oracle DBA Query Assistant (AI Powered)</span>
+                            <span>A.D.A.M Query Assistant (Dual-Engine Hybrid)</span>
                         </h2>
-                        <p class="text-slate-400 text-sm">Ask natural-language questions to instantly generate verified Oracle SQL, purpose, column breakdowns, and safety classifications via Gemini AI.</p>
+                        <p class="text-slate-400 text-sm">Ask natural-language questions to instantly generate verified Oracle SQL, purpose, column breakdowns, and safety classifications.</p>
                     </div>
                 </div>
 
@@ -324,7 +333,7 @@
                                     <input type="text" x-model="currentQueryPrompt" @keydown.enter="generateSQLWithAI()" placeholder="e.g. How do I check blocking sessions in Oracle RAC?" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-red-500">
                                     <button @click="generateSQLWithAI()" :disabled="isGeneratingQuery" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-md shadow-red-600/30 transition-all flex items-center space-x-2 disabled:opacity-50">
                                         <i class="fa-solid" :class="isGeneratingQuery ? 'fa-spinner fa-spin' : 'fa-wand-magic-sparkles'"></i>
-                                        <span x-text="isGeneratingQuery ? 'Generating...' : 'Generate with AI'"></span>
+                                        <span x-text="isGeneratingQuery ? 'Generating...' : 'Generate SQL'"></span>
                                     </button>
                                 </div>
                             </div>
@@ -351,45 +360,40 @@
                                 <i class="fa-solid fa-brain text-indigo-400"></i>
                                 <span>Paste Query Output & Analyze Result</span>
                             </h3>
-                            <p class="text-xs text-slate-400">Paste your SQL query execution output below to let the DBA AI explain what the result means and suggest the next diagnostic step.</p>
+                            <p class="text-xs text-slate-400">Paste your SQL query execution output below to let A.D.A.M explain what the result means and suggest the next diagnostic step.</p>
                             
                             <textarea x-model="queryOutputInput" rows="4" placeholder="Paste result here (e.g. INST_ID | SID | EVENT | BLOCKING_SESSION)..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono text-xs text-slate-200 focus:outline-none focus:border-red-500"></textarea>
                             
                             <button @click="analyzeQueryOutput()" :disabled="isAnalyzingResult" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-md shadow-indigo-600/30 transition-all flex items-center space-x-2 disabled:opacity-50">
                                 <i class="fa-solid" :class="isAnalyzingResult ? 'fa-spinner fa-spin' : 'fa-stethoscope'"></i>
-                                <span x-text="isAnalyzingResult ? 'Analyzing...' : 'Analyze Output & Explain Result'"></span>
+                                <span x-text="isAnalyzingResult ? 'Analyzing Output...' : 'Analyze Output with AI'"></span>
                             </button>
 
-                            <template x-if="analyzedResult">
-                                <div class="mt-4 p-5 rounded-xl bg-slate-950 border border-indigo-500/30 space-y-3">
-                                    <div class="flex items-center space-x-2 text-indigo-400 font-semibold text-sm">
-                                        <i class="fa-solid fa-circle-info"></i>
-                                        <span>AI Analysis & Explanation</span>
-                                    </div>
-                                    <p class="text-xs text-slate-300 leading-relaxed" x-text="analyzedResult.explanation"></p>
-                                    <div class="border-t border-slate-800 pt-3">
-                                        <span class="text-[10px] font-semibold text-amber-400 uppercase tracking-wider">Recommended Next Step:</span>
-                                        <p class="text-xs text-white font-medium mt-1" x-text="analyzedResult.nextStep"></p>
-                                    </div>
-                                </div>
-                            </template>
+                            <div x-show="activeQueryExplanation" class="bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs text-slate-300 space-y-2 mt-4">
+                                <p class="font-semibold text-emerald-400">AI Diagnostic Interpretation:</p>
+                                <div class="whitespace-pre-line leading-relaxed" x-text="activeQueryExplanation"></div>
+                            </div>
                         </div>
                     </div>
 
                     <div class="space-y-6">
                         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
-                            <h3 class="text-sm font-bold text-white uppercase tracking-wider">Query Purpose</h3>
-                            <p class="text-xs text-slate-300 leading-relaxed" x-text="currentQueryDetails.purpose"></p>
-                            
-                            <div class="border-t border-slate-800 pt-4 space-y-3">
-                                <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Column Explanations</h4>
-                                <div class="space-y-2">
-                                    <template x-for="col in currentQueryDetails.columns">
-                                        <div class="p-2.5 rounded-lg bg-slate-950 border border-slate-800">
-                                            <span class="font-mono text-xs font-bold text-red-400" x-text="col.name"></span>
-                                            <p class="text-[11px] text-slate-400 mt-0.5" x-text="col.desc"></p>
-                                        </div>
-                                    </template>
+                            <h3 class="text-base font-bold text-white flex items-center space-x-2">
+                                <i class="fa-solid fa-lightbulb text-amber-400"></i>
+                                <span>Query Metrics & Metadata</span>
+                            </h3>
+                            <div class="space-y-3 text-xs">
+                                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                                    <span class="text-slate-400 block mb-1">Target Version Support</span>
+                                    <span class="text-white font-mono font-semibold" x-text="oracleVersion + ' (Patch Optimized)'"></span>
+                                </div>
+                                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                                    <span class="text-slate-400 block mb-1">Failover Status</span>
+                                    <span class="text-emerald-400 font-mono font-semibold">Gemini ⇄ Groq Auto-Switch Active</span>
+                                </div>
+                                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                                    <span class="text-slate-400 block mb-1">Active User Role</span>
+                                    <span class="text-red-400 font-mono font-semibold" x-text="currentUserRole"></span>
                                 </div>
                             </div>
                         </div>
@@ -397,541 +401,390 @@
                 </div>
             </div>
 
-            <!-- GUIDED INVESTIGATION TAB -->
+            <!-- INVESTIGATION WIZARD TAB -->
             <div x-show="activeTab === 'investigation'" x-cloak class="space-y-6 max-w-7xl mx-auto">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
                         <h2 class="text-2xl font-bold text-white tracking-tight flex items-center space-x-2">
                             <i class="fa-solid fa-stethoscope text-indigo-500"></i>
-                            <span>Guided DBA Investigation Engine</span>
+                            <span>Guided Incident Investigation & Root Cause Analysis</span>
                         </h2>
-                        <p class="text-slate-400 text-sm">Step-by-step interactive troubleshooting wizard with built-in teaching, "Why?" explanations, and dynamic branching.</p>
+                        <p class="text-slate-400 text-sm">Step-by-step diagnostic workflow to isolate production issues and generate professional incident closure notes.</p>
                     </div>
                 </div>
 
-                <template x-if="!investigationActive">
-                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
-                        <h3 class="text-base font-bold text-white">What type of issue are you investigating?</h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                            <template x-for="issue in investigationTypes" :key="issue.id">
-                                <div @click="startInvestigation(issue)" class="bg-slate-950 hover:bg-slate-800/80 border border-slate-800 hover:border-indigo-500/50 p-5 rounded-2xl cursor-pointer transition-all group">
-                                    <div class="flex items-center space-x-3 mb-2">
-                                        <div :class="issue.iconBg" class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg">
-                                            <i :class="issue.icon"></i>
-                                        </div>
-                                        <div>
-                                            <h4 class="font-semibold text-white group-hover:text-indigo-400 transition-colors" x-text="issue.name"></h4>
-                                            <span class="text-[10px] text-slate-400" x-text="issue.steps + ' Steps Wizard'"></span>
-                                        </div>
-                                    </div>
-                                    <p class="text-xs text-slate-400 mt-2" x-text="issue.desc"></p>
-                                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+                        <h3 class="text-base font-bold text-white flex items-center space-x-2">
+                            <i class="fa-solid fa-list-check text-red-500"></i>
+                            <span>Select Symptom / Incident Type</span>
+                        </h3>
+                        <div class="space-y-2">
+                            <template x-for="inv in investigationTypes" :key="inv.id">
+                                <button @click="selectedInvestigation = inv.id; runInvestigationStep()"
+                                    :class="selectedInvestigation === inv.id ? 'bg-red-600/20 border-red-500 text-white font-semibold' : 'bg-slate-950 border-slate-800 text-slate-300 hover:bg-slate-800'"
+                                    class="w-full text-left p-3.5 rounded-xl border text-xs transition-all flex items-center justify-between">
+                                    <span x-text="inv.name"></span>
+                                    <i class="fa-solid fa-chevron-right text-[10px]" :class="selectedInvestigation === inv.id ? 'text-red-400' : 'text-slate-600'"></i>
+                                </button>
                             </template>
                         </div>
                     </div>
-                </template>
 
-                <template x-if="investigationActive">
-                    <div class="space-y-6">
-                        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                            <div>
-                                <div class="flex items-center space-x-2 mb-1">
-                                    <span class="bg-indigo-500/20 text-indigo-400 text-xs px-2.5 py-0.5 rounded-full font-semibold" x-text="currentInvestigation.title"></span>
-                                    <span class="text-slate-400 text-xs" x-text="'Step ' + currentStepIndex + ' of ' + currentInvestigation.totalSteps"></span>
+                    <div class="lg:col-span-2 space-y-6">
+                        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
+                            <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                                <div>
+                                    <span class="text-xs font-semibold text-red-400 uppercase tracking-wider" x-text="'Investigation: ' + selectedInvestigation"></span>
+                                    <h3 class="text-lg font-bold text-white mt-1" x-text="currentInvestigationTitle"></h3>
                                 </div>
-                                <h3 class="text-xl font-bold text-white" x-text="currentStepData.title"></h3>
+                                <button @click="generateRCAWithAI()" :disabled="isGeneratingRCA" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-xs font-semibold shadow-md shadow-indigo-600/30 transition-all flex items-center space-x-2 disabled:opacity-50">
+                                    <i class="fa-solid" :class="isGeneratingRCA ? 'fa-spinner fa-spin' : 'fa-file-shield'"></i>
+                                    <span x-text="isGeneratingRCA ? 'Generating RCA...' : 'Generate AI RCA & Save'"></span>
+                                </button>
                             </div>
-                            <button @click="resetInvestigation()" class="text-xs text-slate-400 hover:text-red-400 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
-                                Abort / Change Issue
-                            </button>
-                        </div>
 
-                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                            <div class="lg:col-span-2 space-y-6">
-                                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
-                                    <div class="flex items-center justify-between">
-                                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Diagnostic Query</span>
-                                        <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[10px] px-2 py-0.5 rounded font-medium">🟢 READ ONLY</span>
-                                    </div>
+                            <div class="space-y-4 text-xs">
+                                <p class="text-slate-300 leading-relaxed" x-text="currentInvestigationDescription"></p>
+                                
+                                <div>
+                                    <span class="font-semibold text-slate-400 uppercase tracking-wider block mb-2">Recommended Diagnostic SQL:</span>
                                     <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono text-xs text-emerald-300 overflow-x-auto">
-                                        <pre x-text="currentStepData.sql"></pre>
+                                        <pre x-text="currentInvestigationSQL"></pre>
                                     </div>
+                                </div>
 
-                                    <div class="border border-slate-800 rounded-xl overflow-hidden">
-                                        <button @click="showWhy = !showWhy" class="w-full bg-slate-950 p-3.5 text-left text-xs font-semibold text-slate-300 flex items-center justify-between hover:bg-slate-900 transition-colors">
-                                            <span class="flex items-center space-x-2">
-                                                <i class="fa-solid fa-circle-question text-amber-400"></i>
-                                                <span>Why are we running this diagnostic step?</span>
-                                            </span>
-                                            <i class="fa-solid" :class="showWhy ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
-                                        </button>
-                                        <div x-show="showWhy" class="p-4 bg-slate-950/50 border-t border-slate-800 text-xs text-slate-300 leading-relaxed" x-text="currentStepData.why"></div>
-                                    </div>
-
-                                    <div class="space-y-3 pt-2">
-                                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Paste Query Output from Database</label>
-                                        <textarea x-model="stepResultInput" rows="3" placeholder="Paste result here..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 font-mono text-xs text-slate-200 focus:outline-none focus:border-indigo-500"></textarea>
-                                        
-                                        <div class="flex justify-end space-x-3">
-                                            <button @click="nextInvestigationStep()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-md shadow-indigo-600/30 transition-all flex items-center space-x-2">
-                                                <span>Analyze & Proceed to Next Step</span>
-                                                <i class="fa-solid fa-arrow-right"></i>
-                                            </button>
-                                        </div>
-                                    </div>
+                                <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-2">
+                                    <p class="font-semibold text-amber-400">Remediation Action Plan:</p>
+                                    <p class="text-slate-300" x-text="currentInvestigationRemediation"></p>
                                 </div>
                             </div>
 
-                            <div class="space-y-6">
-                                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
-                                    <div class="flex items-center space-x-2 text-indigo-400 font-bold text-sm">
-                                        <i class="fa-solid fa-graduation-cap"></i>
-                                        <span>Oracle DBA Tutor Note</span>
-                                    </div>
-                                    <p class="text-xs text-slate-300 leading-relaxed" x-text="currentStepData.tutorNote"></p>
-                                    
-                                    <div class="border-t border-slate-800 pt-4">
-                                        <span class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Investigation State</span>
-                                        <div class="mt-2 space-y-1 text-xs text-slate-400 font-mono">
-                                            <div class="flex justify-between"><span>Database:</span> <strong class="text-white" x-text="dbConfigured ? dbName : 'Unconfigured'"></strong></div>
-                                            <div class="flex justify-between"><span>Issue:</span> <strong class="text-white" x-text="currentInvestigation.title"></strong></div>
-                                            <div class="flex justify-between"><span>Steps Completed:</span> <strong class="text-emerald-400" x-text="currentStepIndex - 1"></strong></div>
-                                        </div>
+                            <div x-show="rcaResult" class="space-y-4 pt-4 border-t border-slate-800">
+                                <div class="flex items-center justify-between">
+                                    <h4 class="text-sm font-bold text-white flex items-center space-x-2">
+                                        <i class="fa-solid fa-shield-halved text-emerald-400"></i>
+                                        <span>Generated Incident RCA & ServiceNow Notes</span>
+                                    </h4>
+                                    <div class="flex gap-2">
+                                        <button @click="saveCurrentRCA()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1">
+                                            <i class="fa-solid fa-bookmark"></i>
+                                            <span>Save to Archive</span>
+                                        </button>
+                                        <button @click="copyRCA()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-semibold">
+                                            Copy RCA
+                                        </button>
                                     </div>
                                 </div>
+                                <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono text-xs text-slate-300 whitespace-pre-line leading-relaxed max-h-96 overflow-y-auto" x-text="rcaResult"></div>
                             </div>
                         </div>
                     </div>
-                </template>
+                </div>
             </div>
 
-            <!-- LEARN ORACLE TAB -->
+            <!-- SAVED RCA ARCHIVE TAB -->
+            <div x-show="activeTab === 'rca_archive'" x-cloak class="space-y-6 max-w-7xl mx-auto">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight flex items-center space-x-2">
+                            <i class="fa-solid fa-box-archive text-purple-500"></i>
+                            <span>Saved Incident RCA Archive</span>
+                        </h2>
+                        <p class="text-slate-400 text-sm">All completed and saved incident RCAs and ServiceNow reports persist here for review, auditing, and future team reference.</p>
+                    </div>
+                    <button @click="activeTab = 'investigation'" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-md shadow-red-600/30 transition-all">
+                        + Create New Investigation RCA
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <template x-for="rca in rcaArchive" :key="rca.id">
+                        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-3 flex flex-col justify-between shadow-sm">
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between text-xs text-slate-500">
+                                    <span class="font-mono" x-text="rca.timestamp"></span>
+                                    <span class="text-red-400 font-semibold" x-text="rca.author"></span>
+                                </div>
+                                <h3 class="font-bold text-white text-base" x-text="rca.title"></h3>
+                                <p class="text-xs text-slate-400 line-clamp-3 font-mono bg-slate-950 p-3 rounded-xl border border-slate-800/60" x-text="rca.content"></p>
+                            </div>
+                            <div class="flex items-center justify-between pt-2 border-t border-slate-800/80">
+                                <button @click="viewSavedRCA(rca)" class="text-xs text-indigo-400 hover:text-indigo-300 font-semibold flex items-center space-x-1">
+                                    <i class="fa-solid fa-eye"></i>
+                                    <span>View Full Report</span>
+                                </button>
+                                <button @click="deleteRCA(rca.id)" class="text-xs text-red-400 hover:text-red-300">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+                    <div x-show="rcaArchive.length === 0" class="col-span-full bg-slate-900 border border-slate-800 p-12 rounded-2xl text-center space-y-3">
+                        <div class="w-12 h-12 bg-slate-800 rounded-full mx-auto flex items-center justify-center text-slate-400 text-xl">
+                            <i class="fa-solid fa-folder-open"></i>
+                        </div>
+                        <h3 class="font-bold text-white text-base">No Saved RCAs Yet</h3>
+                        <p class="text-xs text-slate-400">Complete an investigation and click "Save to Archive" to store your incident reports here.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RUNBOOKS TAB -->
+            <div x-show="activeTab === 'runbooks'" x-cloak class="space-y-6 max-w-7xl mx-auto">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight flex items-center space-x-2">
+                            <i class="fa-solid fa-book-open text-emerald-500"></i>
+                            <span>Enterprise DBA Runbooks & Step-by-Step SOPs</span>
+                        </h2>
+                        <p class="text-slate-400 text-sm">Verified operational procedures for high availability, patching, failover, and disaster recovery.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <template x-for="rb in runbookList" :key="rb.id">
+                        <div @click="selectedRunbook = rb.id"
+                            :class="selectedRunbook === rb.id ? 'border-red-500 bg-red-600/10' : 'border-slate-800 bg-slate-900'"
+                            class="border p-5 rounded-2xl cursor-pointer transition-all space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-semibold uppercase tracking-wider text-red-400" x-text="rb.category"></span>
+                                <i class="fa-solid fa-file-lines text-slate-500"></i>
+                            </div>
+                            <h3 class="font-bold text-white text-base" x-text="rb.title"></h3>
+                            <p class="text-xs text-slate-400" x-text="rb.summary"></p>
+                        </div>
+                    </template>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
+                    <div class="border-b border-slate-800 pb-4">
+                        <span class="text-xs font-semibold text-red-400 uppercase tracking-wider">Active Standard Operating Procedure</span>
+                        <h3 class="text-xl font-bold text-white mt-1" x-text="currentRunbook.title"></h3>
+                    </div>
+
+                    <div class="space-y-4 text-xs text-slate-300">
+                        <div class="space-y-2">
+                            <h4 class="font-bold text-white text-sm">1. Pre-Check & Validation</h4>
+                            <p x-text="currentRunbook.precheck"></p>
+                        </div>
+                        <div class="space-y-2">
+                            <h4 class="font-bold text-white text-sm">2. Execution Steps</h4>
+                            <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono text-emerald-300 space-y-1">
+                                <template x-for="step in currentRunbook.steps" :key="step">
+                                    <div x-text="step"></div>
+                                </template>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <h4 class="font-bold text-white text-sm">3. Verification & Rollback Plan</h4>
+                            <p x-text="currentRunbook.rollback"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LEARNING TAB -->
             <div x-show="activeTab === 'learn'" x-cloak class="space-y-6 max-w-7xl mx-auto">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
                         <h2 class="text-2xl font-bold text-white tracking-tight flex items-center space-x-2">
-                            <i class="fa-solid fa-graduation-cap text-indigo-500"></i>
-                            <span>Oracle DBA Learning Center</span>
+                            <i class="fa-solid fa-graduation-cap text-amber-500"></i>
+                            <span>Oracle Database Architecture & Tuning Academy</span>
                         </h2>
-                        <p class="text-slate-400 text-sm">Master enterprise Oracle architecture, SGA/PGA memory, wait events, locks, and performance tuning.</p>
+                        <p class="text-slate-400 text-sm">Deep-dive masterclasses on SGA/PGA memory tuning, latch contention, undo management, and Oracle 19c/23ai features.</p>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-1.5 h-fit">
-                        <div class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider px-2 mb-2">Knowledge Categories</div>
-                        <template x-for="cat in learningCategories" :key="cat.id">
-                            <button @click="selectedLearningCategory = cat.id"
-                                :class="selectedLearningCategory === cat.id ? 'bg-indigo-600 text-white font-medium shadow-md shadow-indigo-600/30' : 'text-slate-300 hover:bg-slate-800 hover:text-white'"
-                                class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs transition-all text-left">
-                                <span x-text="cat.name"></span>
-                                <i class="fa-solid fa-chevron-right text-[10px] opacity-60"></i>
-                            </button>
-                        </template>
-                    </div>
-
-                    <div class="lg:col-span-3 space-y-6">
-                        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 md:p-8 space-y-6">
-                            <div>
-                                <span class="bg-indigo-500/10 text-indigo-400 text-xs px-2.5 py-0.5 rounded-full font-semibold">Oracle Core Architecture</span>
-                                <h3 class="text-2xl font-bold text-white mt-2" x-text="currentLearningTopic.title"></h3>
-                                <p class="text-sm text-slate-300 mt-2 leading-relaxed" x-text="currentLearningTopic.overview"></p>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <template x-for="mod in learningModules" :key="mod.id">
+                        <div @click="selectedModule = mod.id"
+                            :class="selectedModule === mod.id ? 'border-amber-500 bg-amber-500/10' : 'border-slate-800 bg-slate-900'"
+                            class="border p-5 rounded-2xl cursor-pointer transition-all space-y-2">
+                            <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-sm">
+                                <i :class="mod.icon"></i>
                             </div>
-
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                                <div class="bg-slate-950 border border-slate-800 rounded-xl p-5 space-y-2">
-                                    <h4 class="text-xs font-bold text-indigo-400 uppercase tracking-wider flex items-center space-x-2">
-                                        <i class="fa-solid fa-circle-check"></i>
-                                        <span>Why It Matters for DBAs</span>
-                                    </h4>
-                                    <p class="text-xs text-slate-300 leading-relaxed" x-text="currentLearningTopic.whyMatters"></p>
-                                </div>
-
-                                <div class="bg-slate-950 border border-slate-800 rounded-xl p-5 space-y-2">
-                                    <h4 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center space-x-2">
-                                        <i class="fa-solid fa-triangle-exclamation"></i>
-                                        <span>Common DBA Pitfalls</span>
-                                    </h4>
-                                    <p class="text-xs text-slate-300 leading-relaxed" x-text="currentLearningTopic.pitfalls"></p>
-                                </div>
-                            </div>
-
-                            <div class="border-t border-slate-800 pt-6 space-y-4">
-                                <h4 class="text-sm font-bold text-white uppercase tracking-wider">Essential DBA Commands</h4>
-                                <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono text-xs text-emerald-300 overflow-x-auto">
-                                    <pre x-text="currentLearningTopic.commands"></pre>
-                                </div>
-                            </div>
-
-                            <div class="border-t border-slate-800 pt-6 space-y-4">
-                                <h4 class="text-sm font-bold text-white uppercase tracking-wider">Top Interview Questions</h4>
-                                <div class="space-y-3">
-                                    <template x-for="q in currentLearningTopic.interviewQuestions">
-                                        <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
-                                            <p class="text-xs font-semibold text-white" x-text="q.question"></p>
-                                            <p class="text-[11px] text-slate-400 leading-relaxed" x-text="q.answer"></p>
-                                        </div>
-                                    </template>
-                                </div>
-                            </div>
+                            <h3 class="font-bold text-white text-sm" x-text="mod.title"></h3>
+                            <p class="text-xs text-slate-400" x-text="mod.summary"></p>
                         </div>
+                    </template>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
+                    <div class="border-b border-slate-800 pb-4">
+                        <span class="text-xs font-semibold text-amber-400 uppercase tracking-wider">Academy Masterclass</span>
+                        <h3 class="text-xl font-bold text-white mt-1" x-text="currentModule.title"></h3>
+                    </div>
+                    <div class="space-y-4 text-xs text-slate-300 leading-relaxed">
+                        <p class="text-sm font-medium text-white" x-text="currentModule.subtitle"></p>
+                        <div class="whitespace-pre-line" x-text="currentModule.content"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- DBA CHAT TAB -->
-            <div x-show="activeTab === 'chat'" x-cloak class="space-y-6 max-w-5xl mx-auto h-[calc(100vh-8rem)] flex flex-col">
-                <div class="flex items-center justify-between shrink-0">
-                    <div>
-                        <h2 class="text-2xl font-bold text-white tracking-tight flex items-center space-x-2">
-                            <i class="fa-solid fa-robot text-red-500"></i>
-                            <span>Expert Oracle DBA AI Assistant (Gemini Powered)</span>
-                        </h2>
-                        <p class="text-slate-400 text-sm">Ask complex architectural, tuning, or troubleshooting questions backed by live Oracle expert AI.</p>
-                    </div>
-                </div>
-
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl flex-1 flex flex-col overflow-hidden shadow-xl">
-                    <div class="flex-1 overflow-y-auto p-6 space-y-4" id="chat-messages">
-                        <div class="flex items-start space-x-3">
-                            <div class="w-8 h-8 rounded-xl bg-red-600 flex items-center justify-center text-white text-xs font-bold shrink-0">AI</div>
-                            <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 text-xs text-slate-200 max-w-2xl leading-relaxed space-y-2">
-                                <p>Greetings! I am your Senior Oracle DBA Assistant, created by Mohamed Asif. My knowledge base is fully up to date for 2026, including Oracle 19c quarterly Release Updates (such as 19.32 released in July 2026 and 19.33 in October 2026), 21c, and 23ai. How can I help you today?</p>
-                            </div>
-                        </div>
-
-                        <template x-for="msg in chatMessages" :key="msg.id">
-                            <div :class="msg.sender === 'user' ? 'flex justify-end' : 'flex items-start space-x-3'">
-                                <template x-if="msg.sender === 'ai'">
-                                    <div class="w-8 h-8 rounded-xl bg-red-600 flex items-center justify-center text-white text-xs font-bold shrink-0">AI</div>
-                                </template>
-                                <div :class="msg.sender === 'user' ? 'bg-red-600 text-white rounded-2xl p-4 text-xs max-w-2xl' : 'bg-slate-950 border border-slate-800 text-slate-200 rounded-2xl p-4 text-xs max-w-2xl leading-relaxed space-y-2'">
-                                    <p x-text="msg.text" class="whitespace-pre-wrap"></p>
-                                </div>
-                            </div>
-                        </template>
-
-                        <div x-show="isChatLoading" class="flex items-start space-x-3">
-                            <div class="w-8 h-8 rounded-xl bg-red-600 flex items-center justify-center text-white text-xs font-bold shrink-0">AI</div>
-                            <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 text-xs text-slate-400 flex items-center space-x-2">
-                                <i class="fa-solid fa-spinner fa-spin"></i>
-                                <span>Consulting Oracle knowledge base...</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="p-4 bg-slate-900 border-t border-slate-800">
-                        <div class="flex gap-3">
-                            <input type="text" x-model="chatInput" @keydown.enter="sendChatMessage()" placeholder="Ask anything about Oracle (e.g. What is DB Time? Release updates for 19.33)..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-red-500">
-                            <button @click="sendChatMessage()" :disabled="isChatLoading" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl text-sm font-semibold shadow-md shadow-red-600/30 transition-all flex items-center space-x-2 disabled:opacity-50">
-                                <span>Send</span>
-                                <i class="fa-solid fa-paper-plane"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- DATABASE HEALTH TAB -->
-            <div x-show="activeTab === 'health'" x-cloak class="space-y-6 max-w-7xl mx-auto">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                    <div>
-                        <h2 class="text-2xl font-bold text-white tracking-tight flex items-center space-x-2">
-                            <i class="fa-solid fa-heart-pulse text-emerald-500"></i>
-                            <span>Enterprise Database Health Checklist</span>
-                        </h2>
-                        <p class="text-slate-400 text-sm">Status overview based on your configured database environment and diagnostic checks.</p>
-                    </div>
-                    <button @click="runHealthCheck()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-md shadow-emerald-600/30 transition-all flex items-center space-x-2">
-                        <i class="fa-solid fa-rotate"></i>
-                        <span>Run Diagnostics Check</span>
-                    </button>
-                </div>
-
-                <template x-if="!dbConfigured">
-                    <div class="bg-amber-500/10 border border-amber-500/30 p-6 rounded-2xl text-center space-y-3">
-                        <i class="fa-solid fa-triangle-exclamation text-amber-400 text-2xl"></i>
-                        <h3 class="text-base font-bold text-white">Database Environment Not Configured</h3>
-                        <p class="text-xs text-slate-300 max-w-md mx-auto">Please configure your database name and version on the dashboard to run the health checklist against your environment.</p>
-                        <button @click="activeTab = 'dashboard'" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-xl text-xs font-semibold">Go to Dashboard Setup</button>
-                    </div>
-                </template>
-
-                <template x-if="dbConfigured">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <template x-for="item in healthItems" :key="item.name">
-                            <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-3">
-                                <div class="flex items-center justify-between">
-                                    <h4 class="font-semibold text-white text-sm" x-text="item.name"></h4>
-                                    <span :class="item.status === 'OK' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : (item.status === 'WARN' ? 'bg-amber-500/10 text-amber-400 border-amber-500/30' : 'bg-red-500/10 text-red-400 border-red-500/30')" class="border text-xs px-2.5 py-0.5 rounded-full font-semibold flex items-center space-x-1.5">
-                                        <span class="w-1.5 h-1.5 rounded-full" :class="item.status === 'OK' ? 'bg-emerald-500' : (item.status === 'WARN' ? 'bg-amber-500' : 'bg-red-500')"></span>
-                                        <span x-text="item.statusText"></span>
-                                    </span>
-                                </div>
-                                <p class="text-xs text-slate-400 leading-relaxed" x-text="item.details"></p>
-                                <div class="border-t border-slate-800 pt-3 flex justify-between items-center text-[11px]">
-                                    <span class="text-slate-500">Database: <strong class="text-slate-300" x-text="dbName"></strong></span>
-                                    <button @click="activeTab = 'investigation'" class="text-red-400 hover:underline">Investigate</button>
-                                </div>
-                            </div>
-                        </template>
-                    </div>
-                </template>
-            </div>
-
-            <!-- COMMAND SAFETY TAB -->
-            <div x-show="activeTab === 'safety'" x-cloak class="space-y-6 max-w-4xl mx-auto">
+            <!-- SAFETY CHECKER TAB -->
+            <div x-show="activeTab === 'safety'" x-cloak class="space-y-6 max-w-7xl mx-auto">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
                         <h2 class="text-2xl font-bold text-white tracking-tight flex items-center space-x-2">
                             <i class="fa-solid fa-shield-halved text-amber-500"></i>
-                            <span>Oracle Command Safety Checker</span>
+                            <span>Production SQL Safety & Impact Analyzer</span>
                         </h2>
-                        <p class="text-slate-400 text-sm">Paste any SQL statement or DBA command to evaluate its impact, safety classification, and risk before execution.</p>
+                        <p class="text-slate-400 text-sm">Evaluate any DDL or DML statement for potential table locks, missing WHERE clauses, and production downtime risks.</p>
                     </div>
                 </div>
 
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
-                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Oracle SQL / Command Input</label>
-                    <textarea x-model="safetyCommandInput" rows="4" placeholder="e.g. ALTER SYSTEM KILL SESSION '142,3912' IMMEDIATE;" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono text-xs text-slate-200 focus:outline-none focus:border-amber-500"></textarea>
-                    
-                    <button @click="checkCommandSafety()" class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-md shadow-amber-600/30 transition-all">
-                        Evaluate Safety & Impact
-                    </button>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Paste SQL Statement to Evaluate</label>
+                        <textarea x-model="safetySQLInput" rows="6" placeholder="e.g. DROP TABLE customers CASCADE CONSTRAINTS;" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono text-xs text-slate-200 focus:outline-none focus:border-red-500"></textarea>
+                        <button @click="evaluateSQLSafety()" class="w-full bg-amber-600 hover:bg-amber-700 text-white py-3 rounded-xl font-semibold text-sm shadow-lg shadow-amber-600/30 transition-all flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                            <span>Analyze Production Safety Impact</span>
+                        </button>
+                    </div>
 
-                    <template x-if="safetyResult">
-                        <div class="mt-6 p-6 rounded-2xl bg-slate-950 border border-slate-800 space-y-4">
-                            <div class="flex items-center justify-between">
-                                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Safety Classification</span>
-                                <span :class="safetyResult.badgeClass" class="border text-xs px-3 py-1 rounded-full font-bold" x-text="safetyResult.classification"></span>
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                            <h3 class="text-base font-bold text-white">Risk Evaluation Report</h3>
+                            <span class="border text-xs px-3 py-1 rounded-full font-semibold" :class="safetyRiskBadgeClass" x-text="safetyRiskLevel"></span>
+                        </div>
+                        <div class="space-y-3 text-xs">
+                            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1">
+                                <span class="font-semibold text-slate-400 uppercase tracking-wider block">Impact Summary:</span>
+                                <p class="text-slate-200" x-text="safetyRiskSummary"></p>
                             </div>
+                            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1">
+                                <span class="font-semibold text-amber-400 uppercase tracking-wider block">DBA Recommendation:</span>
+                                <p class="text-slate-300" x-text="safetyRecommendation"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                            <div class="space-y-3">
-                                <div>
-                                    <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Impact Analysis</h4>
-                                    <p class="text-xs text-slate-200 leading-relaxed" x-text="safetyResult.impact"></p>
-                                </div>
-                                <div>
-                                    <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Recommended DBA Procedure</h4>
-                                    <p class="text-xs text-emerald-400 leading-relaxed font-medium" x-text="safetyResult.recommendation"></p>
-                                </div>
+            <!-- CHAT TAB -->
+            <div x-show="activeTab === 'chat'" x-cloak class="space-y-6 max-w-5xl mx-auto h-[calc(100vh-120px)] flex flex-col">
+                <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex items-center justify-between shrink-0">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-xl bg-red-600 text-white flex items-center justify-center font-bold">
+                            <i class="fa-solid fa-robot"></i>
+                        </div>
+                        <div>
+                            <h2 class="font-bold text-white text-sm">A.D.A.M Expert Assistant (Dual-Engine Hybrid)</h2>
+                            <p class="text-[10px] text-slate-400">Trained on Oracle 19c, 21c, 23ai & patch updates (including 19.33 in October 2026)</p>
+                        </div>
+                    </div>
+                    <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[10px] px-2.5 py-1 rounded-full font-medium">Ready</span>
+                </div>
+
+                <div class="flex-1 bg-slate-900 border border-slate-800 rounded-2xl p-4 overflow-y-auto space-y-4" id="chat-container">
+                    <template x-for="msg in chatMessages" :key="msg.text">
+                        <div class="flex items-start space-x-3" :class="msg.sender === 'user' ? 'flex-row-reverse space-x-reverse' : ''">
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0" :class="msg.sender === 'user' ? 'bg-red-600 text-white' : 'bg-slate-800 text-emerald-400 border border-slate-700'">
+                                <i class="fa-solid" :class="msg.sender === 'user' ? 'fa-user' : 'fa-robot'"></i>
+                            </div>
+                            <div class="max-w-[80%] rounded-2xl p-4 text-xs leading-relaxed" :class="msg.sender === 'user' ? 'bg-red-600 text-white rounded-tr-none' : 'bg-slate-950 border border-slate-800 text-slate-200 rounded-tl-none font-mono'">
+                                <div class="whitespace-pre-line" x-text="msg.text"></div>
                             </div>
                         </div>
                     </template>
                 </div>
-            </div>
 
-            <!-- RCA / DOCUMENTATION GENERATOR TAB -->
-            <div x-show="activeTab === 'rca'" x-cloak class="space-y-6 max-w-5xl mx-auto">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                    <div>
-                        <h2 class="text-2xl font-bold text-white tracking-tight flex items-center space-x-2">
-                            <i class="fa-solid fa-file-lines text-indigo-500"></i>
-                            <span>RCA & Documentation Generator (AI Powered)</span>
-                        </h2>
-                        <p class="text-slate-400 text-sm">Paste ticket details, error logs, or investigation output below to generate professional ServiceNow closure notes and Root Cause Analysis (RCA).</p>
-                    </div>
-                </div>
-
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Documentation Type</label>
-                            <select x-model="rcaType" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500">
-                                <option value="rca">Incident Root Cause Analysis (RCA)</option>
-                                <option value="servicenow">ServiceNow Closure Note</option>
-                                <option value="summary">Technical Investigation Summary</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Incident / Ticket Reference</label>
-                            <input type="text" x-model="rcaTicket" placeholder="INC0094821" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Paste Ticket Notes, Error Logs or Investigation Data</label>
-                        <textarea x-model="rcaSourceNotes" rows="5" placeholder="Paste error logs, query output, screenshots text or ticket symptoms here so AI can build the exact RCA..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono text-xs text-slate-200 focus:outline-none focus:border-indigo-500"></textarea>
-                    </div>
-
-                    <button @click="generateRCAWithAI()" :disabled="isGeneratingRCA" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-md shadow-indigo-600/30 transition-all flex items-center space-x-2 disabled:opacity-50">
-                        <i class="fa-solid" :class="isGeneratingRCA ? 'fa-spinner fa-spin' : 'fa-wand-magic-sparkles'"></i>
-                        <span x-text="isGeneratingRCA ? 'Generating Documentation...' : 'Generate Professional Documentation'"></span>
+                <div class="bg-slate-900 border border-slate-800 p-3 rounded-2xl shrink-0 flex items-center space-x-2">
+                    <input type="text" x-model="chatInput" @keydown.enter="sendChatMessage()" placeholder="Ask A.D.A.M any Oracle DBA question..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-red-500">
+                    <button @click="sendChatMessage()" :disabled="isChatting" class="bg-red-600 hover:bg-red-700 text-white px-5 py-3 rounded-xl text-xs font-semibold shadow-md shadow-red-600/30 transition-all flex items-center space-x-2 disabled:opacity-50">
+                        <i class="fa-solid" :class="isChatting ? 'fa-spinner fa-spin' : 'fa-paper-plane'"></i>
+                        <span x-text="isChatting ? 'Thinking...' : 'Send'"></span>
                     </button>
-
-                    <template x-if="generatedRCAText">
-                        <div class="mt-6 space-y-4">
-                            <div class="flex items-center justify-between">
-                                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Generated Output (Markdown)</span>
-                                <button @click="copyRCA()" class="text-xs text-slate-400 hover:text-white bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700 flex items-center space-x-1.5">
-                                    <i class="fa-solid fa-copy"></i>
-                                    <span>Copy Document</span>
-                                </button>
-                            </div>
-                            <div class="bg-slate-950 border border-slate-800 rounded-xl p-5 font-mono text-xs text-slate-200 overflow-x-auto whitespace-pre-wrap leading-relaxed" x-text="generatedRCAText"></div>
-                        </div>
-                    </template>
                 </div>
             </div>
 
-            <!-- RUNBOOK LIBRARY TAB -->
-            <div x-show="activeTab === 'runbooks'" x-cloak class="space-y-6 max-w-5xl mx-auto">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                    <div>
-                        <h2 class="text-2xl font-bold text-white tracking-tight flex items-center space-x-2">
-                            <i class="fa-solid fa-book-open text-red-500"></i>
-                            <span>Enterprise DBA Runbook Library</span>
-                        </h2>
-                        <p class="text-slate-400 text-sm">Verified step-by-step operational runbooks for blocking, tablespace management, high CPU, and RMAN recovery.</p>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-2">
-                        <button @click="selectedRunbook = 'blocking'" :class="selectedRunbook === 'blocking' ? 'bg-red-600 text-white' : 'text-slate-300 hover:bg-slate-800'" class="w-full text-left px-4 py-3 rounded-xl text-xs font-semibold transition-all flex items-center space-x-3">
-                            <i class="fa-solid fa-lock"></i>
-                            <span>Blocking & Lock Contention</span>
-                        </button>
-                        <button @click="selectedRunbook = 'tablespace'" :class="selectedRunbook === 'tablespace' ? 'bg-red-600 text-white' : 'text-slate-300 hover:bg-slate-800'" class="w-full text-left px-4 py-3 rounded-xl text-xs font-semibold transition-all flex items-center space-x-3">
-                            <i class="fa-solid fa-database"></i>
-                            <span>Tablespace Full Resolution</span>
-                        </button>
-                        <button @click="selectedRunbook = 'cpu'" :class="selectedRunbook === 'cpu' ? 'bg-red-600 text-white' : 'text-slate-300 hover:bg-slate-800'" class="w-full text-left px-4 py-3 rounded-xl text-xs font-semibold transition-all flex items-center space-x-3">
-                            <i class="fa-solid fa-microchip"></i>
-                            <span>High CPU & Wait Events</span>
-                        </button>
-                    </div>
-
-                    <div class="md:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-6 md:p-8 space-y-6">
-                        <div>
-                            <span class="bg-red-500/10 text-red-400 text-xs px-2.5 py-0.5 rounded-full font-semibold">Standard Operating Procedure</span>
-                            <h3 class="text-2xl font-bold text-white mt-2" x-text="currentRunbookData.title"></h3>
-                            <p class="text-xs text-slate-400 mt-1" x-text="currentRunbookData.purpose"></p>
-                        </div>
-
-                        <div class="space-y-4">
-                            <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Step-by-Step Execution Guide</h4>
-                            <div class="space-y-3">
-                                <template x-for="(step, idx) in currentRunbookData.steps" :key="idx">
-                                    <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
-                                        <div class="flex items-center space-x-2 text-xs font-bold text-red-400">
-                                            <span x-text="'Step ' + (idx + 1) + ':'"></span>
-                                            <span class="text-white" x-text="step.title"></span>
-                                        </div>
-                                        <div class="bg-slate-900 p-3 rounded-lg font-mono text-xs text-emerald-300 overflow-x-auto">
-                                            <pre x-text="step.sql"></pre>
-                                        </div>
-                                        <p class="text-[11px] text-slate-400" x-text="step.explanation"></p>
-                                    </div>
-                                </template>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- OWNER CONTROL & API USAGE ANALYTICS TAB -->
+            <!-- OWNER & API CONTROL PANEL TAB -->
             <div x-show="activeTab === 'owner' && isOwner" x-cloak class="space-y-6 max-w-7xl mx-auto">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
                         <h2 class="text-2xl font-bold text-white tracking-tight flex items-center space-x-2">
                             <i class="fa-solid fa-user-shield text-red-500"></i>
-                            <span>Owner Control & Team Key Management</span>
+                            <span>Owner Control & Multi-API Router Management</span>
                         </h2>
-                        <p class="text-slate-400 text-sm">Exclusive dashboard for Mohamed Asif to issue team keys, monitor API request volume, and track token usage per user.</p>
+                        <p class="text-slate-400 text-sm">Manage team access keys, configure Gemini & Groq dual-engine failover, change owner password, and monitor usage.</p>
                     </div>
                 </div>
 
-                <!-- Generate Team Key Card -->
-                <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-sm space-y-4">
+                <!-- Owner Password Reset Card -->
+                <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-4">
                     <h3 class="text-base font-bold text-white flex items-center space-x-2">
                         <i class="fa-solid fa-key text-amber-400"></i>
-                        <span>Issue New Team Member Key</span>
+                        <span>Change Master Owner Password</span>
                     </h3>
-                    <p class="text-xs text-slate-400">Create a secure monthly-randomized access key for a team member to access the Oracle DBA Assistant.</p>
-
-                    <div class="flex flex-col sm:flex-row gap-4 items-end pt-2">
-                        <div class="flex-1 w-full">
-                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Team Member Name / Identifier</label>
-                            <input type="text" x-model="newKeyName" placeholder="e.g. Alex Johnson (Senior DBA)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-red-500">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <input type="password" x-model="newOwnerPassword" placeholder="Enter new owner password..." class="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-red-500">
+                        <div class="flex items-center">
+                            <button @click="updateOwnerPassword()" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-xl text-xs font-semibold shadow-md shadow-red-600/30 transition-all">
+                                Update Master Password
+                            </button>
                         </div>
-                        <button @click="generateTeamKey()" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-xl text-xs font-semibold shadow-md shadow-red-600/30 transition-all h-[42px]">
-                            Generate Key
+                    </div>
+                </div>
+
+                <!-- Multi-API Configuration Card -->
+                <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-4">
+                    <h3 class="text-base font-bold text-white flex items-center space-x-2">
+                        <i class="fa-solid fa-network-wired text-indigo-400"></i>
+                        <span>Multi-API Hybrid Failover Configuration (Gemini + Groq)</span>
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Google AI Studio API Key (Gemini)</label>
+                            <input type="password" x-model="apiConfig.geminiKey" @change="saveAPIConfig()" placeholder="AIzaSy..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-red-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Groq API Key (Fast Llama Engine)</label>
+                            <input type="password" x-model="apiConfig.groqKey" @change="saveAPIConfig()" placeholder="gsk_..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-red-500">
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-400">A.D.A.M automatically uses Gemini for deep queries & 19.33 timelines, and fails over to Groq if rate-limited.</p>
+                </div>
+
+                <!-- Team Key Generation & Management -->
+                <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-base font-bold text-white flex items-center space-x-2">
+                            <i class="fa-solid fa-users text-emerald-400"></i>
+                            <span>Team Member Access Keys Management</span>
+                        </h3>
+                        <button @click="generateNewTeamKey()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-semibold shadow-md shadow-emerald-600/30 transition-all">
+                            + Generate Random Team Key
                         </button>
                     </div>
 
-                    <template x-if="generatedNewKey">
-                        <div class="p-4 rounded-xl bg-slate-950 border border-emerald-500/30 space-y-2 mt-4">
-                            <span class="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Generated Access Key (Copy and share personally):</span>
-                            <div class="flex items-center justify-between bg-slate-900 p-3 rounded-lg font-mono text-xs text-white">
-                                <span x-text="generatedNewKey"></span>
-                                <button @click="copyKeyToClipboard(generatedNewKey)" class="text-xs text-slate-400 hover:text-white bg-slate-800 px-2.5 py-1 rounded">Copy</button>
-                            </div>
-                        </div>
-                    </template>
-                </div>
-
-                <!-- Active Team Keys Table -->
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
-                    <h3 class="text-base font-bold text-white flex items-center space-x-2">
-                        <i class="fa-solid fa-users text-indigo-400"></i>
-                        <span>Active Team Keys & Token Usage Analytics</span>
-                    </h3>
-                    <p class="text-xs text-slate-400">Monitor request counts and estimated token consumption across all issued team keys.</p>
-
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-xs">
                             <thead class="bg-slate-950 text-slate-400 uppercase tracking-wider border-b border-slate-800">
                                 <tr>
-                                    <th class="p-3">Team Member</th>
-                                    <th class="p-3">Access Key</th>
-                                    <th class="p-3">Created Date</th>
-                                    <th class="p-3">API Requests</th>
-                                    <th class="p-3">Estimated Tokens</th>
-                                    <th class="p-3 text-right">Action</th>
+                                    <th class="p-3">Team Member Name</th>
+                                    <th class="p-3">Secure Key</th>
+                                    <th class="p-3">Requests Made</th>
+                                    <th class="p-3">Status</th>
+                                    <th class="p-3">Actions</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-800">
-                                <template x-for="member in teamKeys" :key="member.key">
-                                    <tr class="hover:bg-slate-800/40">
-                                        <td class="p-3 font-semibold text-white" x-text="member.name"></td>
-                                        <td class="p-3 font-mono text-amber-400" x-text="member.key"></td>
-                                        <td class="p-3 text-slate-400" x-text="member.created"></td>
-                                        <td class="p-3 font-mono text-emerald-400" x-text="member.requests"></td>
-                                        <td class="p-3 font-mono text-indigo-400" x-text="member.tokens.toLocaleString()"></td>
-                                        <td class="p-3 text-right">
-                                            <button @click="revokeTeamKey(member.key)" class="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 px-2.5 py-1 rounded text-[11px]">Revoke</button>
+                                <template x-for="tk in teamKeys" :key="tk.key">
+                                    <tr>
+                                        <td class="p-3 font-semibold text-white">
+                                            <input type="text" x-model="tk.name" @change="saveTeamKeys()" class="bg-slate-950 border border-slate-800 rounded px-2 py-1 text-xs text-white w-full">
                                         </td>
-                                    </tr>
-                                </template>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- API Usage Logs -->
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
-                    <h3 class="text-base font-bold text-white flex items-center space-x-2">
-                        <i class="fa-solid fa-chart-line text-emerald-400"></i>
-                        <span>Recent Gemini AI API Calls</span>
-                    </h3>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-xs">
-                            <thead class="bg-slate-950 text-slate-400 uppercase tracking-wider border-b border-slate-800">
-                                <tr>
-                                    <th class="p-3">Timestamp</th>
-                                    <th class="p-3">User / Key</th>
-                                    <th class="p-3">Feature</th>
-                                    <th class="p-3">Tokens Used</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-800">
-                                <template x-for="log in apiUsageLogs" :key="log.id">
-                                    <tr class="hover:bg-slate-800/40">
-                                        <td class="p-3 text-slate-400" x-text="log.timestamp"></td>
-                                        <td class="p-3 text-white font-medium" x-text="log.user"></td>
-                                        <td class="p-3 text-indigo-400" x-text="log.feature"></td>
-                                        <td class="p-3 font-mono text-emerald-400" x-text="log.tokens"></td>
+                                        <td class="p-3 font-mono text-emerald-300" x-text="tk.key"></td>
+                                        <td class="p-3 font-mono text-slate-300" x-text="tk.usageCount"></td>
+                                        <td class="p-3">
+                                            <span class="px-2 py-0.5 rounded text-[10px] font-semibold" :class="tk.active ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'bg-red-500/10 text-red-400 border border-red-500/30'" x-text="tk.active ? 'Active' : 'Revoked'"></span>
+                                        </td>
+                                        <td class="p-3 space-x-2">
+                                            <button @click="toggleKeyStatus(tk.key)" class="text-xs text-amber-400 hover:text-amber-300 font-semibold" x-text="tk.active ? 'Revoke' : 'Activate'"></button>
+                                            <button @click="deleteTeamKey(tk.key)" class="text-xs text-red-400 hover:text-red-300">Delete</button>
+                                        </td>
                                     </tr>
                                 </template>
                             </tbody>
@@ -943,20 +796,168 @@
         </main>
     </div>
 
-    <!-- ALPINE APPLICATION SCRIPT -->
+    <!-- ALPINE.JS CONTROLLER LOGIC -->
     <script>
-        function dbaApp() {
-            return {
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('adamApp', () => ({
                 authenticated: false,
-                isOwner: false,
-                currentUserRole: 'Mohamed Asif (Owner)',
+                currentUserRole: 'Owner (Mohamed Asif)',
+                isOwner: true,
                 enteredKey: '',
-                currentMonthlyKey: 'ORACLE-DBA-2026-09',
+                ownerPassword: localStorage.getItem('adam_owner_password') || 'ASIF-OWNER-2026',
+                newOwnerPassword: '',
                 
                 modalOpen: false,
-                modalType: 'success',
                 modalTitle: '',
                 modalMessage: '',
+                modalType: 'success',
+
+                activeTab: 'dashboard',
+                navigation: [
+                    { id: 'dashboard', name: 'Dashboard', icon: 'fa-solid fa-chart-pie' },
+                    { id: 'query', name: 'Query Assistant', icon: 'fa-solid fa-magnifying-glass' },
+                    { id: 'investigation', name: 'Guided Investigation', icon: 'fa-solid fa-stethoscope' },
+                    { id: 'rca_archive', name: 'RCA Archive', icon: 'fa-solid fa-box-archive' },
+                    { id: 'runbooks', name: 'DBA Runbooks', icon: 'fa-solid fa-book-open' },
+                    { id: 'learn', name: 'Oracle Academy', icon: 'fa-solid fa-graduation-cap' },
+                    { id: 'safety', name: 'SQL Safety Checker', icon: 'fa-solid fa-shield-halved' },
+                    { id: 'owner', name: 'Owner & API Control', icon: 'fa-solid fa-user-shield', badge: 'Owner' }
+                ],
+
+                dbConfigured: false,
+                dbName: 'PROD-RAC',
+                oracleVersion: '19c',
+                envType: 'Production',
+
+                teamKeys: JSON.parse(localStorage.getItem('adam_team_keys')) || [
+                    { key: 'TEAM-ASIF-9921', name: 'Senior DBA Team 1', usageCount: 4, active: true },
+                    { key: 'TEAM-ASIF-4412', name: 'Performance Tuning Lead', usageCount: 1, active: true }
+                ],
+
+                apiConfig: JSON.parse(localStorage.getItem('adam_api_config')) || {
+                    geminiKey: '',
+                    groqKey: ''
+                },
+
+                rcaArchive: JSON.parse(localStorage.getItem('adam_rca_archive')) || [],
+
+                querySuggestions: [
+                    'How do I check blocking sessions in Oracle RAC?',
+                    'Show tablespace usage and free space percentage.',
+                    'Identify top 10 SQL queries consuming highest CPU.',
+                    'Check active wait events and session bottlenecks.',
+                    'View invalid objects and compile them.'
+                ],
+                currentQueryPrompt: '',
+                activeGeneratedSQL: 'SELECT inst_id, sid, serial#, event, seconds_in_wait \nFROM gv$session \nWHERE blocking_session IS NOT NULL;',
+                activeSafetyClassification: 'SAFE (Read-Only)',
+                activeSafetyBadgeClass: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
+                isGeneratingQuery: false,
+                copied: false,
+                queryOutputInput: '',
+                activeQueryExplanation: '',
+                isAnalyzingResult: false,
+
+                investigationTypes: [
+                    { id: 'blocking', name: 'Blocking Locks & Hangs' },
+                    { id: 'cpu', name: 'High CPU & Latch Contention' },
+                    { id: 'tablespace', name: 'Tablespace Full / ORA-01653' },
+                    { id: 'io', name: 'Slow I/O & Sequential Reads' }
+                ],
+                selectedInvestigation: 'blocking',
+                currentInvestigationTitle: 'Session Blocking & Concurrency Deadlocks',
+                currentInvestigationDescription: 'When transactions hold exclusive locks without committing, dependent sessions hang waiting on enqueues (TX or TM).',
+                currentInvestigationSQL: 'SELECT s1.username AS blocker, s1.sid AS blocker_sid, s2.username AS waiter, s2.sid AS waiter_sid \nFROM v$lock l1, v$session s1, v$lock l2, v$session s2 \nWHERE s1.sid=l1.sid AND s2.sid=l2.sid AND l1.block=1 AND l2.request > 0 AND l1.id1 = l2.id1;',
+                currentInvestigationRemediation: 'Identify blocker SID and serial#, check alert log, and coordinate with application team before issuing ALTER SYSTEM KILL SESSION.',
+                isGeneratingRCA: false,
+                rcaResult: '',
+
+                runbookList: [
+                    { id: 'blocking', category: 'Locks', title: 'Resolving Blocking Sessions in RAC', summary: 'Quick triage of enqueue waits and session termination.' },
+                    { id: 'tablespace', category: 'Storage', title: 'Handling Tablespace Full & Datafile Expansion', summary: 'Adding datafiles or resizing safely in production.' },
+                    { id: 'cpu', category: 'Performance', title: 'Diagnosing High CPU & SQL Optimization', summary: 'Isolating high CPU consumers using ASH and AWR reports.' }
+                ],
+                selectedRunbook: 'blocking',
+                get currentRunbook() {
+                    const runbooks = {
+                        blocking: {
+                            title: 'Resolving Blocking Sessions in Oracle RAC',
+                            precheck: 'Verify multi-node RAC status and identify enqueue lock holders across instances using GV$LOCK.',
+                            steps: [
+                                '1. Query GV$SESSION and GV$LOCK to isolate holding SID and waiting SID.',
+                                '2. Inspect the blocking SQL statement in GV$SQLAREA.',
+                                '3. Contact application owner or issue: ALTER SYSTEM KILL SESSION \'sid,serial#\' IMMEDIATE;'
+                            ],
+                            rollback: 'If session kill causes transaction rollback wait, monitor SMON cleanup in GV$TRANSACTION.'
+                        },
+                        tablespace: {
+                            title: 'Handling Tablespace Full & Datafile Expansion',
+                            precheck: 'Check DBA_TABLESPACE_USAGE_METRICS and verify disk storage availability on ASM / filesystem mount.',
+                            steps: [
+                                '1. Identify full tablespace name: SELECT tablespace_name, used_percent FROM dba_tablespace_usage_metrics;',
+                                '2. Add datafile: ALTER TABLESPACE users ADD DATAFILE \'+DATA\' SIZE 10G AUTOEXTEND ON NEXT 1G MAXSIZE 32G;',
+                                '3. Verify successful expansion.'
+                            ],
+                            rollback: 'Drop newly added datafile if filesystem allocation fails: ALTER TABLESPACE tablespace_name DROP DATAFILE \'/path/file.dbf\';'
+                        },
+                        cpu: {
+                            title: 'Diagnosing High CPU & SQL Optimization',
+                            precheck: 'Check OS CPU utilization via top/vmstat and Oracle AWR/ASH reports.',
+                            steps: [
+                                '1. Run top SQL query by CPU: SELECT * FROM (SELECT sql_id, cpu_time, executions FROM v$sqlstats ORDER BY cpu_time DESC) WHERE ROWNUM <= 10;',
+                                '2. Generate SQL Tuning Advisor or apply SQL Plan Baseline if execution plan changed.',
+                                '3. Gather statistics if optimizer cardinality is stale.'
+                            ],
+                            rollback: 'Drop SQL Plan Baseline or restore previous optimizer stats.'
+                        }
+                    };
+                    return runbooks[this.selectedRunbook] || runbooks.blocking;
+                },
+
+                learningModules: [
+                    { id: 'sga', title: 'SGA & PGA Memory', icon: 'fa-solid fa-memory', summary: 'Buffer cache, shared pool & memory tuning.' },
+                    { id: 'waits', title: 'Wait Events', icon: 'fa-solid fa-clock', summary: 'DB time, latch contention & async I/O.' },
+                    { id: 'undo', title: 'Undo & Redo', icon: 'fa-solid fa-rotate-left', summary: 'ORA-01555 snapshot too old & redo logs.' },
+                    { id: 'patch', title: 'Release Updates', icon: 'fa-solid fa-shield-virus', summary: 'Understanding 19.32, 19.33 & 23ai lifecycle.' }
+                ],
+                selectedModule: 'sga',
+                get currentModule() {
+                    const mods = {
+                        sga: {
+                            title: 'SGA & PGA Memory Architecture',
+                            subtitle: 'Optimizing Buffer Cache, Shared Pool, and Automatic Memory Management (AMM/ASMM)',
+                            content: 'The System Global Area (SGA) is a group of shared memory structures that contain data and control information for one Oracle Database instance. Key components include the Database Buffer Cache (caching blocks from datafiles), Shared Pool (library cache storing parsed SQL and execution plans), and Redo Log Buffer.\n\nProper sizing of SGA and Program Global Area (PGA) prevents disk paging and ensures high transaction throughput across Oracle 19c and 23ai.'
+                        },
+                        waits: {
+                            title: 'Mastering Oracle Wait Events',
+                            subtitle: 'Diagnosing DB Time Bottlenecks Using V$SESSION_WAIT and ASH',
+                            content: 'Oracle performance tuning revolves around minimizing DB Time. Wait events are categorized into classes such as Concurrency, Administrative, Configuration, Application, and System I/O.\n\nKey wait events to watch: \'db file sequential read\' (index tuning needed), \'enq: TX - row lock contention\' (blocking transactions), and \'log file sync\' (commit bottlenecks).'
+                        },
+                        undo: {
+                            title: 'Undo Management & ORA-01555 Prevention',
+                            subtitle: 'Configuring UNDO_RETENTION and Guaranteed Undo Retention',
+                            content: 'Undo data is generated to support read consistency, rollback transactions, and flashback queries. ORA-01555 (Snapshot Too Old) occurs when query execution requires undo blocks that have been overwritten by concurrent transactions.\n\nMitigation: Increase UNDO_TABLESPACE size and enable RETENTION GUARANTEE.'
+                        },
+                        patch: {
+                            title: 'Oracle Patch Lifecycle & 19.33 / 23ai Updates',
+                            subtitle: 'Staying Current with Quarterly Release Updates (RUs)',
+                            content: 'Oracle releases quarterly Critical Patch Updates (CPUs) and Release Updates (RUs). Oracle 19c is the long-term support release with RUs continuing regularly (e.g. 19.32 and 19.33 in October 2026), while Oracle 23ai introduces advanced AI vector search capabilities and automated database management.'
+                        }
+                    };
+                    return mods[this.selectedModule] || mods.sga;
+                },
+
+                safetySQLInput: '',
+                safetyRiskLevel: 'SAFE',
+                safetyRiskBadgeClass: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
+                safetyRiskSummary: 'Paste any SQL above to evaluate production impact.',
+                safetyRecommendation: 'No statement provided yet.',
+
+                chatMessages: [
+                    { sender: 'ai', text: 'Hello! I am A.D.A.M, your automated database analysis & monitoring assistant. Ask me anything about Oracle 19c, 23ai patch updates, SQL tuning, RMAN backup failures, or RAC troubleshooting.' }
+                ],
+                chatInput: '',
+                isChatting: false,
 
                 showModal(title, message, type = 'success') {
                     this.modalTitle = title;
@@ -965,521 +966,327 @@
                     this.modalOpen = true;
                 },
 
-                teamKeys: [
-                    { key: 'KEY-ASIF-8821-X9', name: 'Alex Johnson (Senior DBA)', created: '2026-09-01', requests: 14, tokens: 18450 },
-                    { key: 'KEY-ASIF-3392-B2', name: 'Sarah Connor (Performance Engineer)', created: '2026-09-12', requests: 8, tokens: 9200 }
-                ],
-                newKeyName: '',
-                generatedNewKey: '',
-                apiUsageLogs: [
-                    { id: 1, timestamp: '2026-09-27 19:10', user: 'Alex Johnson', feature: 'Query Assistant', tokens: 1250 },
-                    { id: 2, timestamp: '2026-09-27 19:22', user: 'Mohamed Asif (Owner)', feature: 'DBA Chat', tokens: 2400 },
-                    { id: 3, timestamp: '2026-09-27 19:28', user: 'Sarah Connor', feature: 'RCA Generator', tokens: 4100 }
-                ],
-
-                generateTeamKey() {
-                    const name = (this.newKeyName || '').trim();
-                    if (!name) {
-                        this.showModal('Error', 'Please enter a team member name.', 'error');
+                authenticateUser() {
+                    const key = this.enteredKey.trim();
+                    if (!key) {
+                        this.showModal('Error', 'Please enter a password or team key.', 'error');
                         return;
                     }
-                    const randomCode = Math.random().toString(36).substring(2, 6).toUpperCase();
-                    const newKey = `KEY-ASIF-${Math.floor(1000 + Math.random() * 9000)}-${randomCode}`;
-                    this.generatedNewKey = newKey;
-                    this.teamKeys.push({
-                        key: newKey,
-                        name: name,
-                        created: new Date().toISOString().split('T')[0],
-                        requests: 0,
-                        tokens: 0
-                    });
-                    this.newKeyName = '';
-                    this.showModal('Success', 'Team key generated successfully for ' + name + '!');
-                },
 
-                revokeTeamKey(keyToRevoke) {
-                    this.teamKeys = this.teamKeys.filter(k => k.key !== keyToRevoke);
-                    this.showModal('Revoked', 'The access key has been revoked.');
-                },
-
-                copyKeyToClipboard(text) {
-                    const temp = document.createElement('textarea');
-                    temp.value = text;
-                    document.body.appendChild(temp);
-                    temp.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(temp);
-                    this.showModal('Copied', 'Key copied to clipboard.');
-                },
-
-                authenticateUser() {
-                    const cleanKey = (this.enteredKey || '').trim();
-                    if (cleanKey === 'ASIF-OWNER-2026' || cleanKey === this.currentMonthlyKey) {
+                    if (key === this.ownerPassword) {
                         this.authenticated = true;
+                        this.currentUserRole = 'Owner (Mohamed Asif)';
                         this.isOwner = true;
-                        this.currentUserRole = 'Mohamed Asif (Platform Owner)';
-                        sessionStorage.setItem('dba_auth', 'true');
-                        sessionStorage.setItem('dba_owner', 'true');
-                        sessionStorage.setItem('dba_role', 'Mohamed Asif (Platform Owner)');
-                    } else {
-                        // Check if it's a valid team key
-                        const foundTeam = this.teamKeys.find(k => k.key === cleanKey);
-                        if (foundTeam) {
-                            this.authenticated = true;
-                            this.isOwner = false;
-                            this.currentUserRole = foundTeam.name;
-                            sessionStorage.setItem('dba_auth', 'true');
-                            sessionStorage.setItem('dba_owner', 'false');
-                            sessionStorage.setItem('dba_role', foundTeam.name);
-                        } else {
-                            this.showModal('Access Denied', 'Invalid Access Key or Master Code. Contact Platform Owner Mohamed Asif for keys.', 'error');
+                        this.showModal('Welcome Owner', 'Successfully authenticated as Platform Owner Mohamed Asif.');
+                        return;
+                    }
+
+                    const foundTeamKey = this.teamKeys.find(tk => tk.key === key && tk.active);
+                    if (foundTeamKey) {
+                        this.authenticated = true;
+                        this.currentUserRole = foundTeamKey.name;
+                        this.isOwner = false;
+                        foundTeamKey.usageCount++;
+                        localStorage.setItem('adam_team_keys', JSON.stringify(this.teamKeys));
+                        this.showModal('Welcome Team Member', `Authenticated successfully as ${foundTeamKey.name}.`);
+                        return;
+                    }
+
+                    this.showModal('Access Denied', 'Invalid password or inactive team key. Please check with Mohamed Asif.', 'error');
+                },
+
+                logout() {
+                    this.authenticated = false;
+                    this.enteredKey = '';
+                    this.currentUserRole = 'Guest';
+                },
+
+                updateOwnerPassword() {
+                    if (!this.newOwnerPassword || this.newOwnerPassword.length < 5) {
+                        this.showModal('Error', 'Password must be at least 5 characters long.', 'error');
+                        return;
+                    }
+                    this.ownerPassword = this.newOwnerPassword;
+                    localStorage.setItem('adam_owner_password', this.ownerPassword);
+                    this.newOwnerPassword = '';
+                    this.showModal('Success', 'Master owner password updated successfully!');
+                },
+
+                saveEnvironment() {
+                    this.dbConfigured = true;
+                    this.showModal('Environment Saved', `Database ${this.dbName} (${this.oracleVersion}) configured successfully.`);
+                },
+
+                saveAPIConfig() {
+                    localStorage.setItem('adam_api_config', JSON.stringify(this.apiConfig));
+                    this.showModal('API Config Saved', 'Gemini & Groq API configuration saved successfully.');
+                },
+
+                generateNewTeamKey() {
+                    const randomNum = Math.floor(1000 + Math.random() * 9000);
+                    const newKey = `TEAM-ASIF-${randomNum}`;
+                    this.teamKeys.push({ key: newKey, name: `Team Member ${this.teamKeys.length + 1}`, usageCount: 0, active: true });
+                    localStorage.setItem('adam_team_keys', JSON.stringify(this.teamKeys));
+                    this.showModal('Key Generated', `New secure key created: ${newKey}`);
+                },
+
+                saveTeamKeys() {
+                    localStorage.setItem('adam_team_keys', JSON.stringify(this.teamKeys));
+                },
+
+                toggleKeyStatus(key) {
+                    const tk = this.teamKeys.find(t => t.key === key);
+                    if (tk) {
+                        tk.active = !tk.active;
+                        localStorage.setItem('adam_team_keys', JSON.stringify(this.teamKeys));
+                    }
+                },
+
+                deleteTeamKey(key) {
+                    this.teamKeys = this.teamKeys.filter(t => t.key !== key);
+                    localStorage.setItem('adam_team_keys', JSON.stringify(this.teamKeys));
+                },
+
+                async callMultiAPI(prompt, systemInstruction) {
+                    const geminiKey = this.apiConfig.geminiKey;
+                    const groqKey = this.apiConfig.groqKey;
+
+                    // 1. Try Gemini API first if configured
+                    if (geminiKey) {
+                        try {
+                            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${geminiKey}`;
+                            const payload = {
+                                contents: [{ parts: [{ text: prompt }] }],
+                                systemInstruction: { parts: [{ text: systemInstruction }] }
+                            };
+                            const response = await fetch(apiUrl, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(payload)
+                            });
+                            if (response.ok) {
+                                const result = await response.json();
+                                const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                                if (text) return text;
+                            }
+                        } catch (e) {
+                            console.warn('Gemini API call failed, failing over to Groq...', e);
                         }
                     }
-                },
 
-                init() {
-                    if (sessionStorage.getItem('dba_auth') === 'true') {
-                        this.authenticated = true;
-                        this.isOwner = sessionStorage.getItem('dba_owner') === 'true';
-                        this.currentUserRole = sessionStorage.getItem('dba_role') || 'Mohamed Asif (Owner)';
+                    // 2. Fallback to Groq API if Gemini fails or is not configured
+                    if (groqKey) {
+                        try {
+                            const groqUrl = 'https://api.groq.com/openai/v1/chat/completions';
+                            const payload = {
+                                model: 'llama-3.3-70b-versatile',
+                                messages: [
+                                    { role: 'system', content: systemInstruction },
+                                    { role: 'user', content: prompt }
+                                ]
+                            };
+                            const response = await fetch(groqUrl, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${groqKey}`
+                                },
+                                body: JSON.stringify(payload)
+                            });
+                            if (response.ok) {
+                                const result = await response.json();
+                                const text = result.choices?.[0]?.message?.content;
+                                if (text) return text;
+                            }
+                        } catch (e) {
+                            console.warn('Groq API call also failed...', e);
+                        }
                     }
-                },
 
-                activeTab: 'dashboard',
-                copied: false,
-                
-                dbConfigured: false,
-                dbName: 'PROD-DB-01',
-                oracleVersion: '19c',
-                envType: 'Production',
-                
-                saveEnvironment() {
-                    if(!this.dbName.trim()) {
-                        this.showModal('Error', 'Please enter a valid database name.', 'error');
-                        return;
+                    // 3. Runtime Environment Platform Injection Fallback
+                    try {
+                        const fallbackUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent`;
+                        const payload = {
+                            contents: [{ parts: [{ text: prompt }] }],
+                            systemInstruction: { parts: [{ text: systemInstruction }] }
+                        };
+                        const response = await fetch(fallbackUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                        if (response.ok) {
+                            const result = await response.json();
+                            const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                            if (text) return text;
+                        }
+                    } catch (e) {
+                        console.warn('Platform runtime injection failed...', e);
                     }
-                    this.dbConfigured = true;
-                    this.showModal('Success', 'Database environment "' + this.dbName + ' (' + this.oracleVersion + ')" successfully configured by Mohamed Asif!');
+
+                    // 4. Offline Expert Knowledge Base Fallback
+                    return this.getOfflineExpertFallback(prompt);
                 },
 
-                navigation: [
-                    { id: 'dashboard', name: 'Dashboard', icon: 'fa-solid fa-house', badge: '' },
-                    { id: 'query', name: 'Query Assistant', icon: 'fa-solid fa-magnifying-glass', badge: 'AI' },
-                    { id: 'investigation', name: 'Guided Investigation', icon: 'fa-solid fa-stethoscope', badge: 'Active' },
-                    { id: 'learn', name: 'Learn Oracle', icon: 'fa-solid fa-graduation-cap', badge: '' },
-                    { id: 'chat', name: 'DBA Chat', icon: 'fa-solid fa-robot', badge: 'AI' },
-                    { id: 'health', name: 'Database Health', icon: 'fa-solid fa-heart-pulse', badge: '' },
-                    { id: 'safety', name: 'Command Safety', icon: 'fa-solid fa-shield-halved', badge: '' },
-                    { id: 'rca', name: 'RCA Generator', icon: 'fa-solid fa-file-lines', badge: 'AI' },
-                    { id: 'runbooks', name: 'Runbook Library', icon: 'fa-solid fa-book-open', badge: '' },
-                    { id: 'owner', name: 'Owner & API Control', icon: 'fa-solid fa-user-shield', badge: 'Owner' }
-                ],
-
-                currentQueryPrompt: '',
-                isGeneratingQuery: false,
-                isAnalyzingResult: false,
-                activeGeneratedSQL: 'SELECT\n    inst_id,\n    sid,\n    serial#,\n    username,\n    event,\n    blocking_instance,\n    blocking_session,\n    seconds_in_wait\nFROM gv$session\nWHERE blocking_session IS NOT NULL;',
-                activeSafetyClassification: '🟢 READ ONLY',
-                activeSafetyBadgeClass: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
-                queryOutputInput: '',
-                analyzedResult: null,
-
-                querySuggestions: [
-                    'How do I check blocking sessions in Oracle RAC?',
-                    'How do I check tablespace usage and datafiles?',
-                    'How do I check invalid objects in the database?',
-                    'How do I check long running sessions and elapsed time?',
-                    'How do I check RMAN backup status and history?'
-                ],
-
-                currentQueryDetails: {
-                    purpose: 'Retrieves active sessions experiencing transaction row lock contention (enq: TX - row lock contention) across all RAC instances using GV$SESSION.',
-                    columns: [
-                        { name: 'INST_ID', desc: 'RAC instance identifier where the session resides.' },
-                        { name: 'SID', desc: 'Oracle session identifier.' },
-                        { name: 'BLOCKING_SESSION', desc: 'The SID of the session holding the lock required by this session.' },
-                        { name: 'SECONDS_IN_WAIT', desc: 'Time in seconds the session has spent waiting for the current event.' }
-                    ]
+                getOfflineExpertFallback(prompt) {
+                    const p = prompt.toLowerCase();
+                    if (p.includes('block') || p.includes('lock')) {
+                        return `--- A.D.A.M OFFLINE KNOWLEDGE (FAILOVER ACTIVE) ---\nTo check blocking sessions in Oracle RAC:\nSELECT inst_id, sid, serial#, event, blocking_session FROM gv$session WHERE blocking_session IS NOT NULL;\nRemediation: Terminate blocker session using ALTER SYSTEM KILL SESSION 'sid,serial#' IMMEDIATE;`;
+                    }
+                    if (p.includes('cpu') || p.includes('top sql')) {
+                        return `--- A.D.A.M OFFLINE KNOWLEDGE (FAILOVER ACTIVE) ---\nTop CPU Consumers Query:\nSELECT * FROM (SELECT sql_id, cpu_time, executions, elapsed_time FROM v$sqlstats ORDER BY cpu_time DESC) WHERE ROWNUM <= 10;`;
+                    }
+                    if (p.includes('tablespace') || p.includes('space')) {
+                        return `--- A.D.A.M OFFLINE KNOWLEDGE (FAILOVER ACTIVE) ---\nTablespace Usage Query:\nSELECT tablespace_name, used_space*8/1024 AS used_gb, tablespace_size*8/1024 AS total_gb FROM dba_tablespace_usage_metrics;`;
+                    }
+                    return `--- A.D.A.M OFFLINE KNOWLEDGE (FAILOVER ACTIVE) ---\nAs your automated database analysis & monitoring assistant (19.33 / 23ai ready), ensure you check alert.log, AWR reports, and ASH data when troubleshooting production anomalies.`;
                 },
 
-                searchQuery(promptText) {
-                    this.currentQueryPrompt = promptText;
-                    this.generateSQLWithAI();
-                },
-
-                copySQL() {
-                    const temp = document.createElement('textarea');
-                    temp.value = this.activeGeneratedSQL;
-                    document.body.appendChild(temp);
-                    temp.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(temp);
-                    this.copied = true;
-                    setTimeout(() => { this.copied = false; }, 2000);
+                async searchQuery(q) {
+                    this.currentQueryPrompt = q;
+                    await this.generateSQLWithAI();
                 },
 
                 async generateSQLWithAI() {
-                    const prompt = (this.currentQueryPrompt || '').trim();
-                    if (!prompt) {
-                        this.showModal('Notice', 'Please enter a natural language question first.', 'error');
-                        return;
-                    }
-
+                    if (!this.currentQueryPrompt) return;
                     this.isGeneratingQuery = true;
-                    const systemPrompt = "You are an expert Oracle DBA assistant created by Mohamed Asif. The current year is 2026. Maintain accurate knowledge of Oracle Database architecture and 2026 Release Update (RU) schedules (e.g., Oracle 19c quarterly RUs, with 19.32 released in July 2026 and 19.33 in October 2026). Given a user question, return ONLY valid JSON with keys: sql (string), purpose (string), safety (READ ONLY or DATABASE CHANGE or HIGH IMPACT ACTION), columns (array of objects with name and desc).";
-                    
-                    try {
-                        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                contents: [{ role: 'user', parts: [{ text: prompt }] }],
-                                systemInstruction: { parts: [{ text: systemPrompt }] }
-                            })
-                        });
-                        const data = await response.json();
-                        const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-                        const cleanJson = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
-                        const parsed = JSON.parse(cleanJson);
+                    const sys = "You are A.D.A.M, an expert automated database analysis and monitoring assistant. Given the user's question, provide verified Oracle SQL, safety classification (SAFE / DANGEROUS), and brief explanation. Format cleanly.";
+                    const res = await this.callMultiAPI(this.currentQueryPrompt, sys);
+                    this.activeGeneratedSQL = res;
+                    this.isGeneratingQuery = false;
+                },
 
-                        this.activeGeneratedSQL = parsed.sql || '-- No SQL generated';
-                        this.currentQueryDetails = {
-                            purpose: parsed.purpose || '',
-                            columns: parsed.columns || []
-                        };
-                        const safety = parsed.safety || 'READ ONLY';
-                        if (safety.includes('HIGH')) {
-                            this.activeSafetyClassification = '🔴 HIGH IMPACT ACTION';
-                            this.activeSafetyBadgeClass = 'bg-red-500/10 text-red-400 border-red-500/30';
-                        } else if (safety.includes('CHANGE') || safety.includes('DATABASE')) {
-                            this.activeSafetyClassification = '🟡 DATABASE CHANGE';
-                            this.activeSafetyBadgeClass = 'bg-amber-500/10 text-amber-400 border-amber-500/30';
-                        } else {
-                            this.activeSafetyClassification = '🟢 READ ONLY';
-                            this.activeSafetyBadgeClass = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
-                        }
-
-                        // Log API Usage
-                        this.apiUsageLogs.unshift({
-                            id: Date.now(),
-                            timestamp: new Date().toISOString().replace('T', ' ').substring(0, 16),
-                            user: this.currentUserRole,
-                            feature: 'Query Assistant',
-                            tokens: Math.floor(800 + Math.random() * 1200)
-                        });
-                    } catch (e) {
-                        this.activeGeneratedSQL = "SELECT inst_id, sid, serial#, username, status, sql_id FROM gv$session WHERE status = 'ACTIVE';";
-                        this.currentQueryDetails = {
-                            purpose: "Generated fallback query for: " + prompt,
-                            columns: [
-                                { name: 'SID', desc: 'Oracle Session ID' },
-                                { name: 'SQL_ID', desc: 'SQL Statement Identifier currently executing' }
-                            ]
-                        };
-                        this.activeSafetyClassification = '🟢 READ ONLY';
-                        this.activeSafetyBadgeClass = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
-                    } finally {
-                        this.isGeneratingQuery = false;
-                    }
+                copySQL() {
+                    navigator.clipboard.writeText(this.activeGeneratedSQL);
+                    this.copied = true;
+                    setTimeout(() => this.copied = false, 2000);
                 },
 
                 async analyzeQueryOutput() {
-                    const output = (this.queryOutputInput || '').trim();
-                    if (!output) {
-                        this.showModal('Notice', 'Please paste query output first.', 'error');
+                    if (!this.queryOutputInput) return;
+                    this.isAnalyzingResult = true;
+                    const sys = "You are A.D.A.M, an expert Oracle DBA assistant. Analyze the provided SQL output result, explain what the metrics mean, and recommend the exact next troubleshooting step.";
+                    const res = await this.callMultiAPI(this.queryOutputInput, sys);
+                    this.activeQueryExplanation = res;
+                    this.isAnalyzingResult = false;
+                },
+
+                runInvestigationStep() {
+                    const invs = {
+                        blocking: {
+                            title: 'Session Blocking & Concurrency Deadlocks',
+                            desc: 'When transactions hold exclusive locks without committing, dependent sessions hang waiting on enqueues.',
+                            sql: 'SELECT s1.username AS blocker, s1.sid AS blocker_sid, s2.username AS waiter, s2.sid AS waiter_sid \nFROM v$lock l1, v$session s1, v$lock l2, v$session s2 \nWHERE s1.sid=l1.sid AND s2.sid=l2.sid AND l1.block=1 AND l2.request > 0 AND l1.id1 = l2.id1;',
+                            remed: 'Identify blocker SID and serial#, check alert log, and coordinate with application team before issuing ALTER SYSTEM KILL SESSION.'
+                        },
+                        cpu: {
+                            title: 'High CPU & Latch Contention',
+                            desc: 'Excessive CPU utilization caused by unindexed table scans, inefficient PL/SQL loops, or latch contention.',
+                            sql: 'SELECT sql_id, sql_text, cpu_time, executions FROM v$sqlarea WHERE cpu_time > 1000000 ORDER BY cpu_time DESC;',
+                            remed: 'Apply SQL Plan Baseline, create missing indexes, or run SQL Tuning Advisor.'
+                        },
+                        tablespace: {
+                            title: 'Tablespace Full / ORA-01653',
+                            desc: 'Failure to extend segment because tablespace has exhausted allocated datafile space.',
+                            sql: 'SELECT tablespace_name, file_name, bytes/1024/1024/1024 AS size_gb, autoextensible FROM dba_data_files;',
+                            remed: 'Add datafile to tablespace or enable autoextend on existing datafiles.'
+                        },
+                        io: {
+                            title: 'Slow I/O & Sequential Reads',
+                            desc: 'High physical I/O latency causing bottleneck across database files.',
+                            sql: 'SELECT file_name,phyrds,phywrts,readtim,writetim FROM v$filestat f, dba_data_files d WHERE f.file# = d.file_id;',
+                            remed: 'Move hot datafiles to faster SAN/SSD storage tiers or tune full table scans.'
+                        }
+                    };
+                    const cur = invs[this.selectedInvestigation];
+                    this.currentInvestigationTitle = cur.title;
+                    this.currentInvestigationDescription = cur.desc;
+                    this.currentInvestigationSQL = cur.sql;
+                    this.currentInvestigationRemediation = cur.remed;
+                },
+
+                async generateRCAWithAI() {
+                    this.isGeneratingRCA = true;
+                    const prompt = `Generate a professional Incident RCA and closure report for Oracle DB (${this.dbName}, Version: ${this.oracleVersion}, Environment: ${this.envType}) regarding ${this.currentInvestigationTitle}. Include Executive Summary, Root Cause Analysis, Actions Taken, and Prevention Measures.`;
+                    const sys = "You are A.D.A.M, an Enterprise Incident Manager and Senior Oracle DBA.";
+                    const res = await this.callMultiAPI(prompt, sys);
+                    this.rcaResult = res;
+                    this.isGeneratingRCA = false;
+                },
+
+                saveCurrentRCA() {
+                    if (!this.rcaResult) return;
+                    const newRCA = {
+                        id: 'RCA-' + Date.now(),
+                        title: this.currentInvestigationTitle,
+                        timestamp: new Date().toLocaleString(),
+                        author: this.currentUserRole,
+                        content: this.rcaResult
+                    };
+                    this.rcaArchive.unshift(newRCA);
+                    localStorage.setItem('adam_rca_archive', JSON.stringify(this.rcaArchive));
+                    this.showModal('RCA Saved', 'Incident RCA successfully saved to your archive.');
+                },
+
+                viewSavedRCA(rca) {
+                    this.currentInvestigationTitle = rca.title;
+                    this.rcaResult = rca.content;
+                    this.activeTab = 'investigation';
+                },
+
+                deleteRCA(id) {
+                    this.rcaArchive = this.rcaArchive.filter(r => r.id !== id);
+                    localStorage.setItem('adam_rca_archive', JSON.stringify(this.rcaArchive));
+                },
+
+                copyRCA() {
+                    navigator.clipboard.writeText(this.rcaResult);
+                    this.showModal('Copied', 'RCA report copied to clipboard.');
+                },
+
+                evaluateSQLSafety() {
+                    const sql = this.safetySQLInput.trim().toUpperCase();
+                    if (!sql) {
+                        this.safetyRiskLevel = 'SAFE';
+                        this.safetyRiskSummary = 'No SQL entered.';
+                        this.safetyRecommendation = 'Please paste a statement.';
                         return;
                     }
-
-                    this.isAnalyzingResult = true;
-                    try {
-                        const prompt = `Analyze this Oracle query output:\n${output}\n\nExplain what this means in beginner-friendly yet technically accurate DBA terms, and give the next recommended troubleshooting step. Return ONLY valid JSON with keys: explanation (string), nextStep (string).`;
-                        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                contents: [{ role: 'user', parts: [{ text: prompt }] }],
-                                systemInstruction: { parts: [{ text: "You are an expert Oracle DBA mentor created by Mohamed Asif. Return JSON only." }] }
-                            })
-                        });
-                        const data = await response.json();
-                        const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-                        const cleanJson = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
-                        this.analyzedResult = JSON.parse(cleanJson);
-                    } catch(e) {
-                        this.analyzedResult = {
-                            explanation: "The query output indicates active database sessions. Examine the wait events or locks present in the output.",
-                            nextStep: "Identify the top SQL statements associated with these sessions using GV$SQL."
-                        };
-                    } finally {
-                        this.isAnalyzingResult = false;
-                    }
-                },
-
-                investigationActive: false,
-                currentInvestigation: null,
-                currentStepIndex: 1,
-                showWhy: false,
-                stepResultInput: '',
-                currentStepData: {
-                    title: 'Step 1 — Check Current Blocking',
-                    sql: 'SELECT inst_id, sid, serial#, username, event, blocking_session FROM gv$session WHERE blocking_session IS NOT NULL;',
-                    why: 'We need to determine whether transaction row lock contention is currently blocking concurrent sessions across RAC nodes.',
-                    tutorNote: 'In Oracle RAC, GV$SESSION aggregates session activity across all instances. A non-null BLOCKING_SESSION indicates dependency.'
-                },
-
-                investigationTypes: [
-                    { id: 'blocking', name: 'Blocking & Lock Contention', steps: 4, desc: 'Troubleshoot enq: TX - row lock contention and identify blockers.', icon: 'fa-solid fa-lock', iconBg: 'bg-red-500/10 text-red-400' },
-                    { id: 'cpu', name: 'High CPU & Wait Events', steps: 4, desc: 'Analyze high CPU utilization, OS processes, and top wait events.', icon: 'fa-solid fa-microchip', iconBg: 'bg-amber-500/10 text-amber-400' },
-                    { id: 'tablespace', name: 'Tablespace Full', steps: 3, desc: 'Resolve out-of-space errors in datafiles and temp segments.', icon: 'fa-solid fa-database', iconBg: 'bg-emerald-500/10 text-emerald-400' }
-                ],
-
-                startInvestigation(issue) {
-                    this.investigationActive = true;
-                    this.currentInvestigation = issue;
-                    this.currentStepIndex = 1;
-                },
-
-                resetInvestigation() {
-                    this.investigationActive = false;
-                    this.currentInvestigation = null;
-                },
-
-                nextInvestigationStep() {
-                    if (this.currentStepIndex < 4) {
-                        this.currentStepIndex++;
-                        this.stepResultInput = '';
-                        this.currentStepData = {
-                            title: `Step ${this.currentStepIndex} — Deep Evidence Collection`,
-                            sql: `SELECT sql_id, elapsed_time, executions, sql_text FROM gv$sql WHERE inst_id = 1 AND rownum <= 5;`,
-                            why: `Gathering execution statistics for step ${this.currentStepIndex} to isolate the culprit SQL.`,
-                            tutorNote: 'Always examine ELAPSED_TIME and EXECUTIONS to identify poorly optimized query plans.'
-                        };
+                    if (sql.includes('DROP') || sql.includes('TRUNCATE')) {
+                        this.safetyRiskLevel = 'CRITICAL DANGER';
+                        this.safetyRiskBadgeClass = 'bg-red-500/10 text-red-400 border-red-500/30';
+                        this.safetyRiskSummary = 'Statement causes permanent data destruction or table structure removal.';
+                        this.safetyRecommendation = 'Requires Change Advisory Board (CAB) approval, verified RMAN backup, and off-peak execution window.';
+                    } else if (sql.includes('DELETE') && !sql.includes('WHERE')) {
+                        this.safetyRiskLevel = 'HIGH RISK';
+                        this.safetyRiskBadgeClass = 'bg-amber-500/10 text-amber-400 border-amber-500/30';
+                        this.safetyRiskSummary = 'DELETE statement executed without a WHERE clause will wipe out all table rows.';
+                        this.safetyRecommendation = 'Always include a restrictive WHERE clause and execute inside a DECLARE BEGIN transaction block.';
                     } else {
-                        this.showModal('Investigation Complete', 'All diagnostic steps completed successfully! You can now generate an RCA in the RCA Generator tab.');
-                        this.resetInvestigation();
+                        this.safetyRiskLevel = 'MODERATE / SAFE';
+                        this.safetyRiskBadgeClass = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
+                        this.safetyRiskSummary = 'Standard DML or query statement with normal transactional scope.';
+                        this.safetyRecommendation = 'Verify execution plan using EXPLAIN PLAN before running in production.';
                     }
                 },
-
-                selectedLearningCategory: 'architecture',
-                learningCategories: [
-                    { id: 'architecture', name: 'Oracle Architecture' },
-                    { id: 'memory', name: 'SGA & PGA Memory' },
-                    { id: 'locks', name: 'Transactions & Locks' },
-                    { id: 'tuning', name: 'Performance Tuning & AWR' }
-                ],
-                learningTopicsData: {
-                    architecture: {
-                        title: 'Oracle Instance & Database Architecture',
-                        overview: 'An Oracle database consists of a database (files on disk) and a database instance (SGA memory structures and background processes).',
-                        whyMatters: 'Understanding how user processes connect via server processes or dispatchers (Shared Server vs Dedicated Server) is vital for capacity planning.',
-                        pitfalls: 'Confusing the instance (memory/processes) with the database (physical datafiles, controlfiles, redologs).',
-                        commands: 'SELECT instance_name, status, version FROM v$instance;\nSHOW PARAMETER db_name;',
-                        interviewQuestions: [
-                            { question: 'What is the difference between an Oracle Instance and an Oracle Database?', answer: 'An instance is the memory and background processes (SGA + PGA + PMON/SMON), whereas a database is the physical disk files.' }
-                        ]
-                    },
-                    memory: {
-                        title: 'SGA & PGA Memory Architecture',
-                        overview: 'Oracle Memory Structure is divided into the System Global Area (SGA) shared by all background and user processes, and Program Global Area (PGA) dedicated to individual session memory.',
-                        whyMatters: 'Proper sizing of SGA (Buffer Cache, Shared Pool) and PGA (Workarea Size) prevents excessive physical disk I/O and ORA-04031 shared pool errors.',
-                        pitfalls: 'Under-sizing the Buffer Cache causes frequent physical disk reads instead of fast memory buffer gets.',
-                        commands: 'SHOW PARAMETER sga_target;\nSHOW PARAMETER pga_aggregate_target;\nSELECT * FROM v$sgastat;',
-                        interviewQuestions: [
-                            { question: 'What is the difference between SGA and PGA?', answer: 'SGA is shared across all database instances and processes, while PGA is private memory allocated for individual session workareas (sorting, hash joins).' }
-                        ]
-                    },
-                    locks: {
-                        title: 'Transactions, Enqueues & Row Lock Contention',
-                        overview: 'Oracle uses fine-grained row-level locking to ensure high concurrency without blocking reads. When concurrent transactions attempt to modify the same row, lock contention occurs.',
-                        whyMatters: 'Unresolved row lock contention leads to application timeouts, hanging transactions, and cascading thread blocking.',
-                        pitfalls: 'Killing sessions blindly without checking uncommitted transactions or application impact.',
-                        commands: 'SELECT * FROM gv$lock WHERE block > 0;\nSELECT * FROM gv$session WHERE blocking_session IS NOT NULL;',
-                        interviewQuestions: [
-                            { question: 'What is enq: TX - row lock contention?', answer: 'It is a wait event indicating a session is waiting for a transaction lock held by another session on the same table row.' }
-                        ]
-                    },
-                    tuning: {
-                        title: 'Performance Tuning, AWR & ASH Analytics',
-                        overview: 'Automatic Workload Repository (AWR) and Active Session History (ASH) collect diagnostic metrics to identify resource bottlenecks, top SQL, and wait events.',
-                        whyMatters: 'Enables DBAs to pinpoint exact performance degradations across CPU, I/O, and concurrency.',
-                        pitfalls: 'Optimizing a query without inspecting its execution plan hash value or bind variables.',
-                        commands: 'SELECT * FROM v$active_session_history WHERE sample_time > SYSDATE - 1/24;\n@?/rdbms/admin/awrrpt.sql',
-                        interviewQuestions: [
-                            { question: 'What is DB Time?', answer: 'DB Time is the total time spent by database sessions in database calls (both CPU time and wait time).' }
-                        ]
-                    }
-                },
-                get currentLearningTopic() {
-                    return this.learningTopicsData[this.selectedLearningCategory] || this.learningTopicsData['architecture'];
-                },
-
-                chatInput: '',
-                isChatLoading: false,
-                chatMessages: [],
 
                 async sendChatMessage() {
-                    const userMsg = (this.chatInput || '').trim();
-                    if(!userMsg) return;
-
-                    this.chatMessages.push({ id: Date.now(), sender: 'user', text: userMsg });
+                    if (!this.chatInput.trim()) return;
+                    const txt = this.chatInput.trim();
+                    this.chatMessages.push({ sender: 'user', text: txt });
                     this.chatInput = '';
-                    this.isChatLoading = true;
+                    this.isChatting = true;
 
-                    try {
-                        const payload = {
-                            contents: [{ role: 'user', parts: [{ text: userMsg }] }],
-                            systemInstruction: { parts: [{ text: "You are an expert Senior Oracle DBA assistant created by Mohamed Asif. The current year is 2026. Maintain absolute technical accuracy regarding Oracle Database architecture, troubleshooting runbooks, and Release Update (RU) cadences (such as Oracle 19.32 released in July 2026 and 19.33 in October 2026). Answer questions with professional Oracle terminology and SQL examples." }] }
-                        };
+                    const sys = "You are A.D.A.M, an expert automated database analysis & monitoring assistant. Provide concise, expert technical advice on Oracle databases (19c, 21c, 23ai), patch updates, and diagnostics.";
+                    const reply = await this.callMultiAPI(txt, sys);
+                    this.chatMessages.push({ sender: 'ai', text: reply });
+                    this.isChatting = false;
 
-                        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(payload)
-                        });
-                        const data = await response.json();
-                        const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Oracle DBA Assistant is online and operational.";
-                        this.chatMessages.push({ id: Date.now(), sender: 'ai', text: aiText });
-
-                        // Log API Usage
-                        this.apiUsageLogs.unshift({
-                            id: Date.now(),
-                            timestamp: new Date().toISOString().replace('T', ' ').substring(0, 16),
-                            user: this.currentUserRole,
-                            feature: 'DBA Chat',
-                            tokens: Math.floor(1200 + Math.random() * 1500)
-                        });
-                    } catch(e) {
-                        this.chatMessages.push({ id: Date.now(), sender: 'ai', text: "Hello! I am currently operating offline. Please check your network connection or API configuration." });
-                    } finally {
-                        this.isChatLoading = false;
-                    }
-                },
-
-                healthItems: [
-                    { name: 'Database Instance', status: 'OK', statusText: 'ONLINE (OPEN)', details: 'All RAC instances are mounted and open for read/write traffic.' },
-                    { name: 'Tablespace Allocation', status: 'WARN', statusText: '88% FULL', details: 'USERS tablespace is approaching high watermark threshold.' },
-                    { name: 'Fast Recovery Area (FRA)', status: 'OK', statusText: '62% USED', details: 'Sufficient space for archivelogs and RMAN backup pieces.' },
-                    { name: 'Invalid Objects', status: 'OK', statusText: '0 INVALID', details: 'No invalid database objects found in SYS or application schemas.' },
-                    { name: 'RMAN Backups', status: 'OK', statusText: 'COMPLETED', details: 'Level 0 incremental backup completed successfully within the last 24 hours.' }
-                ],
-                runHealthCheck() {
-                    this.showModal('Health Check Completed', 'All diagnostic health probes executed successfully against ' + this.dbName + '.');
-                },
-
-                safetyCommandInput: '',
-                safetyResult: null,
-                checkCommandSafety() {
-                    const cmd = (this.safetyCommandInput || '').trim().toUpperCase();
-                    if(!cmd) return;
-
-                    if (cmd.includes('KILL SESSION') || cmd.includes('DROP') || cmd.includes('TRUNCATE')) {
-                        this.safetyResult = {
-                            classification: '🔴 HIGH IMPACT ACTION',
-                            badgeClass: 'bg-red-500/10 text-red-400 border-red-500/30',
-                            impact: 'This command can immediately terminate user connections, roll back active transactions, or remove database objects permanently.',
-                            recommendation: 'Verify business impact, obtain Change Advisory Board (CAB) approval, and confirm blocker status before execution.'
-                        };
-                    } else if (cmd.includes('ALTER SYSTEM') || cmd.includes('ALTER DATABASE') || cmd.includes('GATHER_TABLE_STATS')) {
-                        this.safetyResult = {
-                            classification: '🟡 DATABASE CHANGE',
-                            badgeClass: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
-                            impact: 'Modifies system parameters, memory targets, or optimizer statistics which can alter query execution plans.',
-                            recommendation: 'Perform according to standard DBA operating procedures during approved maintenance windows.'
-                        };
-                    } else {
-                        this.safetyResult = {
-                            classification: '🟢 READ ONLY',
-                            badgeClass: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
-                            impact: 'Does not modify database data, tablespace structures, or configuration parameters.',
-                            recommendation: 'Safe to execute at any time for diagnostic purposes.'
-                        };
-                    }
-                },
-
-                rcaType: 'rca',
-                rcaTicket: 'INC0094821',
-                rcaSourceNotes: '',
-                isGeneratingRCA: false,
-                generatedRCAText: '',
-                async generateRCAWithAI() {
-                    const notes = (this.rcaSourceNotes || '').trim();
-                    if(!notes) {
-                        this.showModal('Notice', 'Please paste ticket notes, error logs or investigation symptoms first.', 'error');
-                        return;
-                    }
-
-                    this.isGeneratingRCA = true;
-                    try {
-                        const prompt = `Generate a professional enterprise ${this.rcaType.toUpperCase()} document for ticket ${this.rcaTicket} on Oracle ${this.oracleVersion} (${this.dbName}) based on these investigation notes/errors:\n\n${notes}`;
-                        const payload = {
-                            contents: [{ role: 'user', parts: [{ text: prompt }] }],
-                            systemInstruction: { parts: [{ text: "You are an enterprise IT DBA manager created by Mohamed Asif. Generate formal markdown documentation including Issue Description, Investigation Findings, Root Cause, Action Taken, and Preventive Recommendations with precise Oracle technical accuracy." }] }
-                        };
-
-                        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(payload)
-                        });
-                        const data = await response.json();
-                        this.generatedRCAText = data.candidates?.[0]?.content?.parts?.[0]?.text || "RCA generated successfully.";
-
-                        // Log API Usage
-                        this.apiUsageLogs.unshift({
-                            id: Date.now(),
-                            timestamp: new Date().toISOString().replace('T', ' ').substring(0, 16),
-                            user: this.currentUserRole,
-                            feature: 'RCA Generator',
-                            tokens: Math.floor(2500 + Math.random() * 1500)
-                        });
-                    } catch(e) {
-                        this.generatedRCAText = `# Root Cause Analysis (RCA) - Ticket ${this.rcaTicket}\n\n## Issue Summary\nDatabase performance degraded due to row lock contention.\n\n## Root Cause\nLong-running uncommitted transaction in module X.\n\n## Resolution\nIdentified blocker and coordinated with application team.`;
-                    } finally {
-                        this.isGeneratingRCA = false;
-                    }
-                },
-                copyRCA() {
-                    const temp = document.createElement('textarea');
-                    temp.value = this.generatedRCAText;
-                    document.body.appendChild(temp);
-                    temp.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(temp);
-                    this.showModal('Copied', 'Documentation copied to clipboard.');
-                },
-
-                selectedRunbook: 'blocking',
-                runbooksData: {
-                    blocking: {
-                        title: 'Blocking & Lock Contention Resolution Runbook',
-                        purpose: 'Identify and resolve enq: TX - row lock contention causing application transaction timeouts.',
-                        steps: [
-                            { title: 'Locate Blocking Sessions', sql: 'SELECT * FROM gv$session WHERE blocking_session IS NOT NULL;', explanation: 'Queries all RAC instances to find waiting sessions and their blockers.' },
-                            { title: 'Identify Blocker SQL', sql: 'SELECT sql_text FROM gv$sql WHERE sql_id = (SELECT sql_id FROM gv$session WHERE sid = :blocker_sid);', explanation: 'Retrieves the exact statement executed by the blocking session.' }
-                        ]
-                    },
-                    tablespace: {
-                        title: 'Tablespace Full Resolution Runbook',
-                        purpose: 'Resolve ORA-01653: unable to extend table by N in tablespace USERS.',
-                        steps: [
-                            { title: 'Check Tablespace Free Space', sql: 'SELECT tablespace_name, sum(bytes)/1024/1024 as free_mb FROM dba_free_space GROUP BY tablespace_name;', explanation: 'Calculates remaining megabytes across all datafiles in each tablespace.' },
-                            { title: 'Add New Datafile', sql: 'ALTER TABLESPACE users ADD DATAFILE \'/u01/app/oracle/oradata/prod/users02.dbf\' SIZE 10G AUTOEXTEND ON NEXT 1G;', explanation: 'Expands tablespace storage capacity by adding a new data file.' }
-                        ]
-                    },
-                    cpu: {
-                        title: 'High CPU & Wait Events Troubleshooting Runbook',
-                        purpose: 'Isolate processes and SQL IDs consuming excessive CPU or causing high DB Time.',
-                        steps: [
-                            { title: 'Check Top CPU Sessions', sql: 'SELECT sid, serial#, username, cpu_time, sql_id FROM v$session WHERE status = \'ACTIVE\' ORDER BY cpu_time DESC;', explanation: 'Identifies active sessions ranked by CPU consumption.' },
-                            { title: 'Analyze Execution Plan', sql: 'SELECT * FROM table(dbms_xplan.display_cursor(:sql_id));', explanation: 'Inspects the execution plan of the resource-heavy SQL statement.' }
-                        ]
-                    }
-                },
-                get currentRunbookData() {
-                    return this.runbooksData[this.selectedRunbook] || this.runbooksData['blocking'];
+                    const container = document.getElementById('chat-container');
+                    if (container) container.scrollTop = container.scrollHeight;
                 }
-            }
-        }
+            }));
+        });
     </script>
 </body>
 </html>
