@@ -61,7 +61,7 @@
             </div>
 
             <div class="mt-8 pt-6 border-t border-slate-800/60 text-center text-xs text-slate-500">
-                Authorized Enterprise DBA Access Only • Oracle 19.33 / 23ai Ready
+                Authorized Enterprise DBA Access Only • Oracle 19.32 (Patched) / 23ai Ready
             </div>
         </div>
     </div>
@@ -145,7 +145,7 @@
                         <i class="fa-solid fa-book-medical w-4 text-red-500"></i>DBA Runbooks
                     </button>
                     <button onclick="switchTab('learning')" id="nav-btn-learning" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800/80 transition-all text-left">
-                        <i class="fa-solid fa-graduation-cap w-4 text-red-500"></i>Learning Center (19.33)
+                        <i class="fa-solid fa-graduation-cap w-4 text-red-500"></i>Learning Center (19.32)
                     </button>
                     <button onclick="switchTab('safety')" id="nav-btn-safety" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800/80 transition-all text-left">
                         <i class="fa-solid fa-shield-virus w-4 text-red-500"></i>SQL Safety Checker
@@ -197,7 +197,7 @@
                         <div class="flex items-center gap-2">
                             <span class="text-xs text-slate-400">Target Version:</span>
                             <select id="query-version-select" class="bg-slate-950 border border-slate-800 text-xs text-white rounded-xl px-3 py-2 focus:outline-none focus:border-red-500 font-mono">
-                                <option value="19c">Oracle 19c (19.33 Patched)</option>
+                                <option value="19c">Oracle 19c (19.32 Patched)</option>
                                 <option value="23ai">Oracle 23ai AI Vector Search</option>
                                 <option value="12c">Oracle 12c R2</option>
                             </select>
@@ -271,11 +271,11 @@
                                 <div class="space-y-3 text-xs">
                                     <div class="bg-slate-950 border border-slate-800 p-3 rounded-xl space-y-1">
                                         <div class="text-slate-500">Target Version Support</div>
-                                        <div class="text-slate-200 font-semibold" id="meta-version-display">19c (19.33 Patched)</div>
+                                        <div class="text-slate-200 font-semibold" id="meta-version-display">19c (19.32 Patched)</div>
                                     </div>
                                     <div class="bg-slate-950 border border-slate-800 p-3 rounded-xl space-y-1">
                                         <div class="text-slate-500">Failover Status</div>
-                                        <div class="text-emerald-400 font-semibold" id="meta-failover-display">Gemini ⇄ Groq Auto-Switch Active</div>
+                                        <div class="text-emerald-400 font-semibold" id="meta-failover-display">Gemini (flash-latest) ⇄ Groq Auto-Switch Active</div>
                                     </div>
                                     <div class="bg-slate-950 border border-slate-800 p-3 rounded-xl space-y-1">
                                         <div class="text-slate-500">Active User Role</div>
@@ -461,7 +461,7 @@
                         <h2 class="text-xl font-bold text-white flex items-center gap-2">
                             <i class="fa-solid fa-graduation-cap text-red-500"></i> Oracle Learning Center & Release Timeline
                         </h2>
-                        <p class="text-xs text-slate-400 mt-1">Anchored to the September 2026 operational timeline and Oracle Release 19.33 / 23ai specifications.</p>
+                        <p class="text-xs text-slate-400 mt-1">Anchored to the September 2026 operational timeline. Currently patched to Oracle Release Update 19.32, with 19.33 and 23ai specifications covered below.</p>
                     </div>
 
                     <!-- Dynamic Patch & Release Tracker -->
@@ -929,10 +929,11 @@
             let geminiFailed = false;
             let groqFailed = false;
             
-            // Try Gemini First if configured (using stable gemini-1.5-flash endpoint format)
+            // Try Gemini First if configured (using the gemini-flash-latest alias, which always
+            // points at Google's current GA Flash model, so this keeps working across retirements)
             if (appState.geminiKey) {
                 try {
-                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${appState.geminiKey}`, {
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${appState.geminiKey}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -1057,7 +1058,7 @@
             input.value = '';
             container.scrollTop = container.scrollHeight;
 
-            const generalMentorPrompt = "You are A.D.A.M, an expert Oracle DBA with deep knowledge of Oracle 19c/19.33 and 23ai architecture. Answer general questions clearly and conversationally: explain concepts, features, best practices, and version differences. This is a general knowledge Q&A channel, not an incident troubleshooting session, so keep answers informative and self-contained rather than asking the user to paste diagnostic output. Use fenced ```sql code blocks when sharing example SQL.";
+            const generalMentorPrompt = "You are A.D.A.M, an expert Oracle DBA with deep knowledge of Oracle 19c (currently patched to Release Update 19.32, with 19.33 scheduled for October 20, 2026) and 23ai architecture. Answer general questions clearly and conversationally: explain concepts, features, best practices, and version differences. This is a general knowledge Q&A channel, not an incident troubleshooting session, so keep answers informative and self-contained rather than asking the user to paste diagnostic output. Use fenced ```sql code blocks when sharing example SQL.";
 
             const response = await callAiEngine(msg, generalMentorPrompt);
             appState.askChatHistory.push({ role: 'assistant', content: response.text });
@@ -1102,7 +1103,7 @@
             removeAttachment();
             container.scrollTop = container.scrollHeight;
 
-            const seniorMentorPrompt = "You are A.D.A.M, an expert, senior Oracle DBA mentor with decades of production enterprise experience (Oracle 19.33 & 23ai RAC). Interact like an experienced, supportive senior human colleague. Never give generic, robotic canned responses or bulleted lists of random suggestions. Instead, guide the user step-by-step through their troubleshooting session: talk conversationally, ask probing questions about what they see in their environment, request specific query outputs (like v$session, v$process, ASH, or alert logs) when needed, analyze what they provide, explain the underlying Oracle mechanics calmly, and collaborate closely until you find the exact root cause and resolution. Use fenced ```sql code blocks for any SQL you ask the user to run.";
+            const seniorMentorPrompt = "You are A.D.A.M, an expert, senior Oracle DBA mentor with decades of production enterprise experience (Oracle 19.32-patched 19c & 23ai RAC). Interact like an experienced, supportive senior human colleague. Never give generic, robotic canned responses or bulleted lists of random suggestions. Instead, guide the user step-by-step through their troubleshooting session: talk conversationally, ask probing questions about what they see in their environment, request specific query outputs (like v$session, v$process, ASH, or alert logs) when needed, analyze what they provide, explain the underlying Oracle mechanics calmly, and collaborate closely until you find the exact root cause and resolution. Use fenced ```sql code blocks for any SQL you ask the user to run.";
             
             const response = await callAiEngine(msg, seniorMentorPrompt);
             
@@ -1286,7 +1287,7 @@
 
             if (appState.geminiKey) {
                 try {
-                    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${appState.geminiKey}`, {
+                    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${appState.geminiKey}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ contents: [{ parts: [{ text: 'Ping test' }] }] })
