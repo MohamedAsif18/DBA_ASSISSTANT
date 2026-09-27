@@ -88,7 +88,7 @@
                     <div>
                         <div class="flex items-center gap-2">
                             <span class="font-bold text-base tracking-tight text-white">A.D.A.M</span>
-                            <span class="bg-red-500/10 text-red-400 border border-red-500/20 text-[10px] font-semibold px-2 py-0.5 rounded-full">Enterprise v5.3</span>
+                            <span class="bg-red-500/10 text-red-400 border border-red-500/20 text-[10px] font-semibold px-2 py-0.5 rounded-full">Enterprise v5.4</span>
                         </div>
                         <div class="text-[11px] text-slate-400 flex items-center gap-1.5">
                             <span>Automated Database Analysis & Monitoring (Multi-API Hybrid Engine)</span>
@@ -286,9 +286,9 @@
                     <div class="bg-gradient-to-r from-slate-900 to-slate-900/60 border border-slate-800 rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div>
                             <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                                <i class="fa-solid fa-brain text-red-500"></i> A.D.A.M Guided Investigation Wizard
+                                <i class="fa-solid fa-brain text-red-500"></i> A.D.A.M Senior Mentor Guided Investigation
                             </h2>
-                            <p class="text-xs text-slate-400 mt-1">Step-by-step diagnostic workflow. Describe your issue, paste logs/queries, attach log files, and click Resolved when fixed to generate an RCA.</p>
+                            <p class="text-xs text-slate-400 mt-1">Chat live with your senior human DBA mentor. Paste query results, attach log files, and solve issues step-by-step until final resolution.</p>
                         </div>
                         <div class="flex items-center gap-2">
                             <button onclick="concludeInvestigation()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2.5 rounded-xl text-xs font-semibold transition-all shadow-lg shadow-emerald-600/20 flex items-center gap-2">
@@ -305,8 +305,8 @@
                                     <i class="fa-solid fa-robot"></i>
                                 </div>
                                 <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 text-slate-200 max-w-3xl leading-relaxed">
-                                    <strong>A.D.A.M Guided Diagnostic Session Started.</strong><br>
-                                    Please describe the issue you are experiencing (e.g. ORA-00600, high wait events, session locks), paste any relevant SQL queries or error logs, or attach a log file using the paperclip icon below. I will guide you step-by-step toward the root cause and resolution!
+                                    <strong>Hey there! I'm A.D.A.M, your senior DBA colleague.</strong><br>
+                                    What are we troubleshooting today? Drop your ORA- errors, sluggish SQL queries, or wait events below, and let's tackle it together step-by-step until we find the root cause.
                                 </div>
                             </div>
                         </div>
@@ -322,7 +322,7 @@
                             <button onclick="document.getElementById('chat-file-input').click()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 p-3 rounded-xl transition-all border border-slate-700" title="Attach Log File">
                                 <i class="fa-solid fa-paperclip"></i>
                             </button>
-                            <input type="text" id="chat-input" placeholder="Type your issue, describe symptoms, or paste query output..." 
+                            <input type="text" id="chat-input" placeholder="Talk to your senior DBA mentor or paste query output..." 
                                 onkeydown="if(event.key==='Enter') sendChatMessage()"
                                 class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-red-500 font-mono">
                             <button onclick="sendChatMessage()" class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white px-6 py-3 rounded-xl text-xs font-medium transition-all shadow-lg shadow-red-600/20 flex items-center gap-2">
@@ -736,7 +736,6 @@
             appState.rateLimited = true;
             appState.rateLimitCountdown = 60; // 60 seconds cooldown timer
             
-            // Change background tint to warning amber/red
             document.getElementById('app-body').classList.add('bg-amber-950/30');
             document.getElementById('rate-limit-banner').classList.remove('hidden');
 
@@ -755,16 +754,16 @@
             }, 1000);
         }
 
-        // AI Multi-API Router with Automatic Failover & Limit Warning
+        // AI Multi-API Router with Automatic Failover & Senior DBA Mentor Prompt
         async function callAiEngine(prompt, systemInstruction = "") {
             trackUsage();
             let geminiFailed = false;
             let groqFailed = false;
             
-            // Try Gemini First if configured
+            // Try Gemini First if configured (using stable gemini-1.5-flash)
             if (appState.geminiKey) {
                 try {
-                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${appState.geminiKey}`, {
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${appState.geminiKey}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -774,7 +773,7 @@
                     if (res.ok) {
                         const data = await res.json();
                         const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-                        if (text) return { text, provider: 'Gemini (3.8 Flash)' };
+                        if (text) return { text, provider: 'Gemini (1.5 Flash)' };
                     } else if (res.status === 429) {
                         geminiFailed = true;
                     }
@@ -785,7 +784,7 @@
                 geminiFailed = true;
             }
 
-            // Fallback to Groq if configured
+            // Fallback to Groq if configured (using valid standard model: llama-3.3-70b-versatile)
             if (appState.groqKey) {
                 try {
                     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -795,7 +794,7 @@
                             'Authorization': `Bearer ${appState.groqKey}`
                         },
                         body: JSON.stringify({
-                            model: 'llama-3.1-70b-versatile',
+                            model: 'llama-3.3-70b-versatile',
                             messages: [
                                 { role: 'system', content: systemInstruction || 'You are A.D.A.M, an expert Oracle Database Administrator assistant.' },
                                 { role: 'user', content: prompt }
@@ -805,7 +804,7 @@
                     if (res.ok) {
                         const data = await res.json();
                         const text = data.choices?.[0]?.message?.content;
-                        if (text) return { text, provider: 'Groq (Llama 3.1 70B)' };
+                        if (text) return { text, provider: 'Groq (Llama 3.3 70B)' };
                     } else if (res.status === 429) {
                         groqFailed = true;
                     }
@@ -822,7 +821,7 @@
             }
 
             // Offline Expert Failover Fallback
-            return { text: getOfflineExpertResponse(prompt), provider: 'A.D.A.M Offline Expert Engine (Warning: May give approximate answers)' };
+            return { text: getOfflineExpertResponse(prompt), provider: 'A.D.A.M Senior Mentor (Offline Fallback)' };
         }
 
         function getOfflineExpertResponse(prompt) {
@@ -834,7 +833,7 @@
             } else if (p.includes('lock') || p.includes('blocking')) {
                 return `SELECT l1.sid blocker_sid, l2.sid waiter_sid FROM v$lock l1, v$lock l2 WHERE l1.block = 1 AND l2.request > 0 AND l1.id1 = l2.id1;`;
             }
-            return `--- A.D.A.M EXPERT GUIDED STEP (OFFLINE FALLBACK) ---\n1. Inspect Alert Log for ORA- errors.\n2. Run ASH / AWR reports to isolate contention points.\n3. Apply Oracle 19.33 RU patch if affected by known bug.`;
+            return `Hey, let's walk through this together. Since my live link is resting right now, let's check the absolute basics first: Can you check the alert log for recent ORA- errors or run a quick ASH query to see what wait events are spiking? Tell me what you see!`;
         }
 
         // Query Assistant Functions
@@ -869,11 +868,11 @@
             resBox.classList.remove('hidden');
             resBox.innerText = 'Analyzing query output...';
 
-            const result = await callAiEngine(out, 'Analyze this Oracle SQL output, explain bottlenecks, and suggest next diagnostic step.');
+            const result = await callAiEngine(out, 'Analyze this Oracle SQL output as a senior DBA mentor, explain bottlenecks clearly, and suggest the exact next diagnostic step.');
             resBox.innerText = result.text;
         }
 
-        // Guided Investigation Chat Functions
+        // Guided Investigation Chat Functions (Senior Human DBA Persona)
         async function sendChatMessage() {
             const input = document.getElementById('chat-input');
             let msg = input.value.trim();
@@ -894,9 +893,9 @@
             removeAttachment();
             container.scrollTop = container.scrollHeight;
 
-            const systemPrompt = "You are A.D.A.M, an expert Oracle DBA guided investigation partner. Help the user step-by-step to diagnose the database issue, ask clarifying questions if necessary, inspect logs or queries provided, and guide them toward the exact root cause and resolution.";
+            const seniorMentorPrompt = "You are A.D.A.M, an expert, senior Oracle DBA mentor with decades of production enterprise experience (Oracle 19.33 & 23ai RAC). Interact like an experienced, supportive senior human colleague. Never give generic, robotic canned responses or bulleted lists of random suggestions. Instead, guide the user step-by-step through their troubleshooting session: talk conversationally, ask probing questions about what they see in their environment, request specific query outputs (like v$session, v$process, ASH, or alert logs) when needed, analyze what they provide, explain the underlying Oracle mechanics calmly, and collaborate closely until you find the exact root cause and resolution.";
             
-            const response = await callAiEngine(msg, systemPrompt);
+            const response = await callAiEngine(msg, seniorMentorPrompt);
             
             appState.chatHistory.push({ role: 'assistant', content: response.text });
 
@@ -913,8 +912,7 @@
                 <div class="flex gap-3">
                     <div class="w-8 h-8 rounded-xl bg-red-600/10 border border-red-500/20 flex items-center justify-center text-red-500 shrink-0"><i class="fa-solid fa-robot"></i></div>
                     <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 text-slate-200 max-w-3xl leading-relaxed">
-                        <strong>A.D.A.M Guided Diagnostic Session Reset.</strong><br>
-                        Describe your issue or attach logs to begin a new step-by-step investigation.
+                        <strong>Session reset.</strong> What database issue are we tackling next? Tell me what you're seeing!
                     </div>
                 </div>`;
             appState.chatHistory = [];
@@ -927,9 +925,9 @@
             }
 
             const ticketId = 'INC-' + Math.floor(100000 + Math.random() * 900000);
-            const prompt = `Based on this troubleshooting conversation history, generate a formal Root Cause Analysis (RCA) report and ServiceNow closure notes:\n` + JSON.stringify(appState.chatHistory);
+            const prompt = `Based on this collaborative troubleshooting conversation between the senior DBA mentor and team member, generate a formal Root Cause Analysis (RCA) document and ServiceNow closure notes:\n` + JSON.stringify(appState.chatHistory);
             
-            const result = await callAiEngine(prompt, 'You are an expert Oracle DBA. Write a formal RCA document with Incident Summary, Root Cause, Resolution Steps, and Preventive Actions.');
+            const result = await callAiEngine(prompt, 'You are an expert Oracle DBA. Write a formal, comprehensive RCA document including Incident Summary, Root Cause Analysis, Step-by-Step Resolution, and Preventive Actions.');
 
             const rcaDoc = {
                 id: ticketId,
@@ -1038,7 +1036,7 @@
 
             if (appState.geminiKey) {
                 try {
-                    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${appState.geminiKey}`, {
+                    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${appState.geminiKey}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ contents: [{ parts: [{ text: 'Ping test' }] }] })
@@ -1052,7 +1050,7 @@
                     const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${appState.groqKey}` },
-                        body: JSON.stringify({ model: 'llama-3.1-70b-versatile', messages: [{ role: 'user', content: 'Ping test' }] })
+                        body: JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: [{ role: 'user', content: 'Ping test' }] })
                     });
                     groqStatus = r.ok ? 'SUCCESS (Connected)' : `FAILED (HTTP ${r.status})`;
                 } catch(e) { groqStatus = 'ERROR (Invalid Key or Network)'; }
