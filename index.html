@@ -69,13 +69,13 @@
     <!-- MAIN APP WRAPPER -->
     <div id="app-wrapper" class="hidden flex-col min-h-screen">
         
-        <!-- RATE LIMIT EXCEEDED WARNING BANNER -->
+        <!-- RATE LIMIT / CORS WARNING BANNER -->
         <div id="rate-limit-banner" class="hidden bg-amber-500/20 border-b border-amber-500/40 px-6 py-2.5 flex items-center justify-between text-xs text-amber-300 font-mono z-50">
             <div class="flex items-center gap-2">
                 <i class="fa-solid fa-triangle-exclamation text-amber-400 animate-bounce text-sm"></i>
-                <span><strong>WARNING:</strong> API key limits exceeded on both Gemini and Groq! Key limit will refresh in <span id="rate-limit-countdown" class="font-bold underline">60</span>s. Note: Responses may give inaccurate answers during offline fallback mode.</span>
+                <span><strong>WARNING:</strong> API limits or browser CORS restriction reached! Reverting in <span id="rate-limit-countdown" class="font-bold underline">60</span>s. Note: Responses may give approximate answers during offline fallback mentor mode.</span>
             </div>
-            <span class="text-[10px] bg-amber-500/30 px-2 py-0.5 rounded text-amber-200">Rate Limited</span>
+            <span class="text-[10px] bg-amber-500/30 px-2 py-0.5 rounded text-amber-200">Fallback Active</span>
         </div>
 
         <!-- HEADER -->
@@ -88,7 +88,7 @@
                     <div>
                         <div class="flex items-center gap-2">
                             <span class="font-bold text-base tracking-tight text-white">A.D.A.M</span>
-                            <span class="bg-red-500/10 text-red-400 border border-red-500/20 text-[10px] font-semibold px-2 py-0.5 rounded-full">Enterprise v5.5</span>
+                            <span class="bg-red-500/10 text-red-400 border border-red-500/20 text-[10px] font-semibold px-2 py-0.5 rounded-full">Enterprise v5.7</span>
                         </div>
                         <div class="text-[11px] text-slate-400 flex items-center gap-1.5">
                             <span>Automated Database Analysis & Monitoring (Multi-API Hybrid Engine)</span>
@@ -730,7 +730,7 @@
             document.getElementById('chat-file-input').value = '';
         }
 
-        // Trigger Rate Limit Visual State
+        // Trigger Rate Limit / CORS Warning Visual State
         function triggerRateLimitWarning() {
             if (appState.rateLimited) return;
             appState.rateLimited = true;
@@ -774,7 +774,7 @@
                         const data = await res.json();
                         const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
                         if (text) return { text, provider: 'Gemini (1.5 Flash)' };
-                    } else if (res.status === 429) {
+                    } else {
                         geminiFailed = true;
                     }
                 } catch (e) {
@@ -784,7 +784,7 @@
                 geminiFailed = true;
             }
 
-            // Fallback to Groq if configured (using valid standard model: llama-3.3-70b-versatile)
+            // Fallback to Groq if configured (using openai/gpt-oss-120b)
             if (appState.groqKey) {
                 try {
                     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -794,7 +794,7 @@
                             'Authorization': `Bearer ${appState.groqKey}`
                         },
                         body: JSON.stringify({
-                            model: 'llama-3.3-70b-versatile',
+                            model: 'openai/gpt-oss-120b',
                             messages: [
                                 { role: 'system', content: systemInstruction || 'You are A.D.A.M, an expert Oracle Database Administrator assistant.' },
                                 { role: 'user', content: prompt }
@@ -804,8 +804,8 @@
                     if (res.ok) {
                         const data = await res.json();
                         const text = data.choices?.[0]?.message?.content;
-                        if (text) return { text, provider: 'Groq (Llama 3.3 70B)' };
-                    } else if (res.status === 429) {
+                        if (text) return { text, provider: 'Groq (GPT OSS 120B)' };
+                    } else {
                         groqFailed = true;
                     }
                 } catch (e) {
@@ -815,13 +815,13 @@
                 groqFailed = true;
             }
 
-            // If BOTH APIs failed or hit rate limits, trigger warning background & countdown
+            // If BOTH APIs failed, hit rate limits, or encountered CORS/network restrictions
             if (geminiFailed && groqFailed) {
                 triggerRateLimitWarning();
             }
 
-            // Offline Expert Failover Fallback
-            return { text: getOfflineExpertResponse(prompt), provider: 'A.D.A.M Senior Mentor (Offline Fallback)' };
+            // Offline Senior Mentor Expert Fallback
+            return { text: getOfflineExpertResponse(prompt), provider: 'A.D.A.M Senior Mentor (Offline Fallback Mode)' };
         }
 
         function getOfflineExpertResponse(prompt) {
@@ -833,7 +833,7 @@
             } else if (p.includes('lock') || p.includes('blocking')) {
                 return `SELECT l1.sid blocker_sid, l2.sid waiter_sid FROM v$lock l1, v$lock l2 WHERE l1.block = 1 AND l2.request > 0 AND l1.id1 = l2.id1;`;
             }
-            return `Hey, let's walk through this together. Since my live link is resting right now, let's check the absolute basics first: Can you check the alert log for recent ORA- errors or run a quick ASH query to see what wait events are spiking? Tell me what you see!`;
+            return `Hey, let's walk through this together. Since my live API link is resting right now, let's check the absolute basics first: Can you check your alert log for recent ORA- errors or run a quick ASH query to see what wait events are spiking? Tell me what you see!`;
         }
 
         // Query Assistant Functions
@@ -1042,7 +1042,7 @@
                         body: JSON.stringify({ contents: [{ parts: [{ text: 'Ping test' }] }] })
                     });
                     geminiStatus = r.ok ? 'SUCCESS (Connected)' : `FAILED (HTTP ${r.status})`;
-                } catch(e) { geminiStatus = 'ERROR (Invalid Key or Network)'; }
+                } catch(e) { geminiStatus = 'ERROR (CORS or Network Block)'; }
             }
 
             if (appState.groqKey) {
@@ -1050,10 +1050,10 @@
                     const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${appState.groqKey}` },
-                        body: JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: [{ role: 'user', content: 'Ping test' }] })
+                        body: JSON.stringify({ model: 'openai/gpt-oss-120b', messages: [{ role: 'user', content: 'Ping test' }] })
                     });
                     groqStatus = r.ok ? 'SUCCESS (Connected)' : `FAILED (HTTP ${r.status})`;
-                } catch(e) { groqStatus = 'ERROR (Invalid Key or Network)'; }
+                } catch(e) { groqStatus = 'ERROR (CORS or Network Block)'; }
             }
 
             resBox.innerHTML = `Gemini: <span class="${geminiStatus.includes('SUCCESS')?'text-emerald-400':'text-red-400'}">${geminiStatus}</span><br>Groq: <span class="${groqStatus.includes('SUCCESS')?'text-emerald-400':'text-red-400'}">${groqStatus}</span>`;
