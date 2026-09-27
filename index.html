@@ -50,6 +50,7 @@
                     <div class="relative">
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500"><i class="fa-solid fa-key"></i></span>
                         <input type="password" id="login-key-input" placeholder="Enter Owner Password or Team Key..." 
+                            onkeydown="if(event.key==='Enter') handleLogin()"
                             class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 pl-10 text-sm text-white focus:outline-none focus:border-red-500 transition-all font-mono">
                     </div>
                 </div>
@@ -923,7 +924,7 @@
             } else if (p.includes('lock') || p.includes('blocking')) {
                 return "```sql\nSELECT l1.sid blocker_sid, l2.sid waiter_sid FROM v$lock l1, v$lock l2 WHERE l1.block = 1 AND l2.request > 0 AND l1.id1 = l2.id1;\n```";
             }
-            return "Let's review the architecture and logs together. Since live API endpoints are resting, check youralert log for ORA- errors or run ASH diagnostics.";
+            return "Let's review the architecture and logs together. Since live API endpoints are resting, check your alert log for ORA- errors or run ASH diagnostics.";
         }
 
         // Ask A.D.A.M Chat Functions (General Q&A)
