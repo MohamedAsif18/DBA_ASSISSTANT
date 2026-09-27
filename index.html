@@ -112,7 +112,7 @@
                     <i class="fa-solid fa-triangle-exclamation text-amber-400"></i>
                     <span class="hidden sm:inline">Safety Check</span>
                 </button>
-                <button onclick="switchTab('chat')" class="bg-red-600 hover:bg-red-500 text-white px-3.5 py-1.5 rounded-xl text-xs font-medium transition-all shadow-lg shadow-red-600/20 flex items-center gap-1.5">
+                <button onclick="switchTab('ask')" class="bg-red-600 hover:bg-red-500 text-white px-3.5 py-1.5 rounded-xl text-xs font-medium transition-all shadow-lg shadow-red-600/20 flex items-center gap-1.5">
                     <i class="fa-solid fa-comments"></i>
                     <span>Ask A.D.A.M</span>
                 </button>
@@ -131,6 +131,9 @@
                     <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider px-3 mb-2">Navigation</div>
                     <button onclick="switchTab('query')" id="nav-btn-query" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800/80 transition-all text-left">
                         <i class="fa-solid fa-terminal w-4 text-red-500"></i>Query Assistant
+                    </button>
+                    <button onclick="switchTab('ask')" id="nav-btn-ask" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800/80 transition-all text-left">
+                        <i class="fa-solid fa-comments w-4 text-red-500"></i>Ask A.D.A.M
                     </button>
                     <button onclick="switchTab('chat')" id="nav-btn-chat" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800/80 transition-all text-left">
                         <i class="fa-solid fa-brain w-4 text-red-500"></i>Guided Investigation
@@ -162,6 +165,9 @@
                     </button>
                     <button onclick="loadRunbookModal('cpu')" class="w-full text-left px-3 py-2 rounded-lg text-xs text-slate-400 hover:text-white hover:bg-slate-800/50 transition-all flex items-center gap-2">
                         <i class="fa-solid fa-gauge-high text-[10px] text-emerald-400"></i>High CPU & Wait Events
+                    </button>
+                    <button onclick="loadRunbookModal('archivelog')" class="w-full text-left px-3 py-2 rounded-lg text-xs text-slate-400 hover:text-white hover:bg-slate-800/50 transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-folder-tree text-[10px] text-blue-400"></i>FRA / Archive Log Full
                     </button>
                 </div>
 
@@ -234,7 +240,7 @@
                                         <span id="sql-safety-badge" class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-semibold px-2 py-0.5 rounded-full">SAFE (Read-Only)</span>
                                     </div>
                                     <div class="relative">
-                                        <pre id="generated-sql-output" class="bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs font-mono text-emerald-400 min-h-[160px] overflow-x-auto whitespace-pre-wrap">-- Enter a question above or click a quick prompt to generate enterprise Oracle SQL scripts.</pre>
+                                        <div id="generated-sql-output" class="bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs text-slate-300 min-h-[160px] overflow-x-auto">-- Enter a question above or click a quick prompt to generate enterprise Oracle SQL scripts.</div>
                                         <button onclick="copySql()" class="absolute top-3 right-3 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-2.5 py-1 rounded-lg border border-slate-700 transition-all flex items-center gap-1.5">
                                             <i class="fa-regular fa-copy"></i> Copy SQL
                                         </button>
@@ -252,7 +258,7 @@
                                 <button onclick="analyzeQueryOutput()" class="bg-slate-800 hover:bg-slate-700 text-white font-medium px-4 py-2.5 rounded-xl text-xs transition-all border border-slate-700 flex items-center gap-2">
                                     <i class="fa-solid fa-magnifying-glass-chart text-red-400"></i> Analyze Output with A.D.A.M
                                 </button>
-                                <div id="query-analysis-result" class="bg-slate-950 border border-slate-800/80 rounded-xl p-4 text-xs text-slate-300 hidden font-mono"></div>
+                                <div id="query-analysis-result" class="bg-slate-950 border border-slate-800/80 rounded-xl p-4 text-xs text-slate-300 hidden"></div>
                             </div>
                         </div>
 
@@ -281,14 +287,50 @@
                     </div>
                 </div>
 
-                <!-- 2. GUIDED INVESTIGATION ASSISTANT TAB (CHAT) -->
+                <!-- 2A. ASK A.D.A.M TAB (GENERAL Q&A) -->
+                <div id="tab-ask" class="space-y-6 hidden">
+                    <div class="bg-gradient-to-r from-slate-900 to-slate-900/60 border border-slate-800 rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-comments text-red-500"></i> Ask A.D.A.M
+                            </h2>
+                            <p class="text-xs text-slate-400 mt-1">General Oracle architecture questions, feature lookups, and day-to-day DBA best practices. For structured incident troubleshooting, use Guided Investigation instead.</p>
+                        </div>
+                        <button onclick="clearAskChat()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2.5 rounded-xl text-xs font-medium transition-all border border-slate-700">Reset</button>
+                    </div>
+
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col h-[550px]">
+                        <div id="ask-messages" class="flex-1 overflow-y-auto space-y-4 pr-2 mb-4 font-mono text-xs">
+                            <div class="flex gap-3">
+                                <div class="w-8 h-8 rounded-xl bg-red-600/10 border border-red-500/20 flex items-center justify-center text-red-500 shrink-0">
+                                    <i class="fa-solid fa-robot"></i>
+                                </div>
+                                <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 text-slate-200 max-w-3xl leading-relaxed">
+                                    <strong>Hi, I'm A.D.A.M.</strong><br>
+                                    Ask me anything about Oracle architecture, features, patching, or general DBA best practices — no active incident required.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2 pt-2 border-t border-slate-800">
+                            <input type="text" id="ask-input" placeholder="Ask a general Oracle question..." 
+                                onkeydown="if(event.key==='Enter') sendAskMessage()"
+                                class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-red-500 font-mono">
+                            <button onclick="sendAskMessage()" class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white px-6 py-3 rounded-xl text-xs font-medium transition-all shadow-lg shadow-red-600/20 flex items-center gap-2">
+                                <i class="fa-solid fa-paper-plane"></i> Send
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2B. GUIDED INVESTIGATION TAB (RCA TROUBLESHOOTING) -->
                 <div id="tab-chat" class="space-y-6 hidden">
                     <div class="bg-gradient-to-r from-slate-900 to-slate-900/60 border border-slate-800 rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div>
                             <h2 class="text-xl font-bold text-white flex items-center gap-2">
                                 <i class="fa-solid fa-brain text-red-500"></i> A.D.A.M Senior Mentor Guided Investigation
                             </h2>
-                            <p class="text-xs text-slate-400 mt-1">Chat live with your senior human DBA mentor. Paste query results, attach log files, and solve issues step-by-step until final resolution.</p>
+                            <p class="text-xs text-slate-400 mt-1">Chat live with your senior human DBA mentor. Paste query results, attach log files, and solve issues step-by-step until final resolution and RCA archiving.</p>
                         </div>
                         <div class="flex items-center gap-2">
                             <button onclick="concludeInvestigation()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2.5 rounded-xl text-xs font-semibold transition-all shadow-lg shadow-emerald-600/20 flex items-center gap-2">
@@ -363,7 +405,7 @@
                                     <button onclick="downloadRca()" class="bg-red-600 hover:bg-red-500 text-white text-xs px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5"><i class="fa-solid fa-download"></i> Download</button>
                                 </div>
                             </div>
-                            <pre id="rca-output-preview" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs font-mono text-slate-300 min-h-[320px] overflow-y-auto whitespace-pre-wrap">-- Select an archived RCA document above to inspect full diagnostic findings, root cause, and ServiceNow closure notes.</pre>
+                            <div id="rca-output-preview" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs text-slate-300 min-h-[320px] overflow-y-auto">-- Select an archived RCA document above to inspect full diagnostic findings, root cause, and ServiceNow closure notes.</div>
                         </div>
                     </div>
                 </div>
@@ -374,7 +416,7 @@
                         <h2 class="text-xl font-bold text-white flex items-center gap-2">
                             <i class="fa-solid fa-book-medical text-red-500"></i> Interactive DBA Runbooks
                         </h2>
-                        <p class="text-xs text-slate-400 mt-1">Step-by-step verified operational runbooks for critical Oracle DBA tasks and emergency recovery.</p>
+                        <p class="text-xs text-slate-400 mt-1">Multi-phase operational runbooks (Triage → Diagnostics → Remediation → Verification) for critical Oracle DBA tasks and emergency recovery.</p>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -396,6 +438,12 @@
                             <p class="text-xs text-slate-400 leading-relaxed">Analyze Active Session History (ASH) to pinpoint CPU-hogging SQL statements instantly.</p>
                             <button onclick="loadRunbookModal('cpu')" class="w-full bg-slate-800 hover:bg-slate-700 text-white text-xs py-2 rounded-xl border border-slate-700 transition-all">Open Runbook</button>
                         </div>
+                        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4 shadow-xl">
+                            <div class="w-10 h-10 rounded-xl bg-blue-600/10 text-blue-500 border border-blue-500/20 flex items-center justify-center font-bold">04</div>
+                            <h3 class="text-sm font-bold text-white">FRA / Archive Log Full</h3>
+                            <p class="text-xs text-slate-400 leading-relaxed">Recover from a full Fast Recovery Area or archive destination without impacting availability.</p>
+                            <button onclick="loadRunbookModal('archivelog')" class="w-full bg-slate-800 hover:bg-slate-700 text-white text-xs py-2 rounded-xl border border-slate-700 transition-all">Open Runbook</button>
+                        </div>
                     </div>
 
                     <div id="runbook-viewer" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4 shadow-xl hidden">
@@ -403,7 +451,7 @@
                             <h3 id="runbook-title" class="text-base font-bold text-white">Select a runbook above</h3>
                             <button onclick="document.getElementById('runbook-viewer').classList.add('hidden')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
                         </div>
-                        <div id="runbook-content" class="text-xs text-slate-300 space-y-3 font-mono"></div>
+                        <div id="runbook-content" class="text-xs text-slate-300 space-y-4"></div>
                     </div>
                 </div>
 
@@ -411,9 +459,42 @@
                 <div id="tab-learning" class="space-y-6 hidden">
                     <div class="bg-gradient-to-r from-slate-900 to-slate-900/60 border border-slate-800 rounded-2xl p-6">
                         <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                            <i class="fa-solid fa-graduation-cap text-red-500"></i> Oracle Learning Center & 2026 Timeline
+                            <i class="fa-solid fa-graduation-cap text-red-500"></i> Oracle Learning Center & Release Timeline
                         </h2>
-                        <p class="text-xs text-slate-400 mt-1">Anchored to the October 2026 timeline and Oracle Release 19.33 / 23ai specifications.</p>
+                        <p class="text-xs text-slate-400 mt-1">Anchored to the September 2026 operational timeline and Oracle Release 19.33 / 23ai specifications.</p>
+                    </div>
+
+                    <!-- Dynamic Patch & Release Tracker -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4 shadow-xl">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-600/10 text-emerald-500 border border-emerald-500/20 flex items-center justify-center">
+                                <i class="fa-solid fa-timeline"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-white">Dynamic Patch & Release Tracker</h3>
+                                <div class="text-xs text-slate-400">Track your currently patched Release Update against the upcoming schedule.</div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-2">
+                                <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Your Currently Patched RU</label>
+                                <div class="flex gap-2">
+                                    <input type="text" id="current-ru-input" placeholder="e.g., 19.32" class="flex-1 bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-emerald-500">
+                                    <button onclick="saveCurrentRu()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3 py-2 rounded-lg font-medium transition-all">Save</button>
+                                </div>
+                                <div class="text-[11px] text-slate-500">Currently set to: <span id="current-ru-display" class="text-emerald-400 font-mono">Not Set</span></div>
+                            </div>
+                            <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-1">
+                                <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Next Scheduled Release</div>
+                                <div class="text-white font-bold text-sm">Oracle 19.33 RU</div>
+                                <div class="text-xs text-red-400 font-mono">Target: October 20, 2026</div>
+                            </div>
+                            <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-1">
+                                <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Countdown</div>
+                                <div id="patch-countdown-display" class="text-lg font-bold text-emerald-400">--</div>
+                                <div class="text-[11px] text-slate-500">Relative to today's operational date.</div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -462,7 +543,7 @@
                         <button onclick="runSafetyCheck()" class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-medium px-5 py-3 rounded-xl text-xs transition-all shadow-lg shadow-red-600/20">
                             Run Safety Inspection
                         </button>
-                        <div id="safety-result" class="bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs font-mono text-slate-300 hidden"></div>
+                        <div id="safety-result" class="bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs text-slate-300 hidden"></div>
                     </div>
                 </div>
 
@@ -592,13 +673,65 @@
             targetDb: localStorage.getItem('adam_target_db') || null,
             teamKeys: JSON.parse(localStorage.getItem('adam_team_keys') || '[]'),
             rcaArchive: JSON.parse(localStorage.getItem('adam_rca_archive') || '[]'),
+            currentRu: localStorage.getItem('adam_current_ru') || '',
             chatHistory: [],
+            askChatHistory: [],
             attachedFileContent: null,
             attachedFileName: null,
             rateLimited: false,
             rateLimitCountdown: 0,
             rateLimitTimer: null
         };
+
+        // ---------- Rich Text / Markdown-lite Renderer ----------
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        function renderInline(text) {
+            if (!text) return '';
+            let t = escapeHtml(text);
+            t = t.replace(/\*\*(.+?)\*\*/g, '<strong class="text-white">$1</strong>');
+            t = t.replace(/`([^`]+?)`/g, '<code class="bg-slate-800 text-red-300 px-1 py-0.5 rounded text-[11px]">$1</code>');
+            t = t.replace(/\n/g, '<br>');
+            return t;
+        }
+
+        function renderRichText(raw) {
+            if (!raw) return '';
+            const parts = String(raw).split(/```(\w*)\n?([\s\S]*?)```/g);
+            let html = '';
+            for (let i = 0; i < parts.length; i += 3) {
+                const textSegment = parts[i];
+                if (textSegment) html += `<div class="leading-relaxed">${renderInline(textSegment)}</div>`;
+                if (parts[i + 1] !== undefined) {
+                    const lang = (parts[i + 1] || 'sql').toUpperCase();
+                    const code = (parts[i + 2] || '').replace(/^\n/, '').trim();
+                    const blockId = 'code-' + Math.random().toString(36).slice(2, 10);
+                    html += `
+                        <div class="relative bg-slate-950 border border-slate-800 rounded-xl my-3 overflow-hidden">
+                            <div class="flex items-center justify-between bg-slate-900/80 px-3 py-1.5 border-b border-slate-800">
+                                <span class="text-[10px] uppercase tracking-wider text-red-400 font-semibold">${escapeHtml(lang)}</span>
+                                <button onclick="copyCodeBlock(this, '${blockId}')" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-0.5 rounded-lg border border-slate-700 flex items-center gap-1 transition-all"><i class="fa-regular fa-copy"></i> Copy</button>
+                            </div>
+                            <pre id="${blockId}" class="p-3 text-xs font-mono text-emerald-400 overflow-x-auto whitespace-pre">${escapeHtml(code)}</pre>
+                        </div>`;
+                }
+            }
+            return html || `<div class="leading-relaxed">${renderInline(String(raw))}</div>`;
+        }
+
+        function copyCodeBlock(btn, id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            navigator.clipboard.writeText(el.innerText);
+            const original = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> Copied';
+            setTimeout(() => { btn.innerHTML = original; }, 1500);
+        }
 
         // Authentication Handler
         function handleLogin() {
@@ -657,12 +790,14 @@
 
             updateDbHeader();
             renderRcaArchive();
+            document.getElementById('current-ru-input').value = appState.currentRu;
+            renderPatchTracker();
             switchTab('query');
         }
 
         // Navigation Switcher
         function switchTab(tabId) {
-            ['query', 'chat', 'rca', 'runbooks', 'learning', 'safety', 'owner'].forEach(t => {
+            ['query', 'ask', 'chat', 'rca', 'runbooks', 'learning', 'safety', 'owner'].forEach(t => {
                 const el = document.getElementById('tab-' + t);
                 const btn = document.getElementById('nav-btn-' + t);
                 if (el) el.classList.add('hidden');
@@ -702,6 +837,40 @@
                 status.className = 'w-2 h-2 rounded-full bg-amber-500 animate-pulse';
                 badge.innerText = 'Not Selected';
                 badge.className = 'text-amber-400 font-mono';
+            }
+        }
+
+        // Dynamic Patch & Release Tracker
+        function saveCurrentRu() {
+            const val = document.getElementById('current-ru-input').value.trim();
+            if (!val) return;
+            appState.currentRu = val;
+            localStorage.setItem('adam_current_ru', val);
+            renderPatchTracker();
+        }
+
+        function renderPatchTracker() {
+            const display = document.getElementById('current-ru-display');
+            const countdown = document.getElementById('patch-countdown-display');
+            if (display) display.innerText = appState.currentRu || 'Not Set';
+
+            const target = new Date('2026-10-20T00:00:00');
+            const now = new Date();
+            const diffDays = Math.ceil((target - now) / (1000 * 60 * 60 * 24));
+
+            if (!countdown) return;
+            if (diffDays > 1) {
+                countdown.innerText = `${diffDays} days remaining`;
+                countdown.className = 'text-lg font-bold text-emerald-400';
+            } else if (diffDays === 1) {
+                countdown.innerText = `1 day remaining`;
+                countdown.className = 'text-lg font-bold text-amber-400';
+            } else if (diffDays === 0) {
+                countdown.innerText = `Releasing today`;
+                countdown.className = 'text-lg font-bold text-amber-400';
+            } else {
+                countdown.innerText = `19.33 is now available`;
+                countdown.className = 'text-lg font-bold text-red-400';
             }
         }
 
@@ -827,11 +996,11 @@
         function getOfflineExpertResponse(prompt) {
             const p = prompt.toLowerCase();
             if (p.includes('cpu') || p.includes('top')) {
-                return `SELECT * FROM (SELECT sql_text, cpu_time/1000000 cpu_sec, executions FROM v$sqlarea ORDER BY cpu_time DESC) WHERE ROWNUM <= 10;`;
+                return "```sql\nSELECT * FROM (SELECT sql_text, cpu_time/1000000 cpu_sec, executions FROM v$sqlarea ORDER BY cpu_time DESC) WHERE ROWNUM <= 10;\n```";
             } else if (p.includes('redo') || p.includes('log')) {
-                return `SELECT group#, thread#, bytes/1024/1024 MB, status FROM v$log;`;
+                return "```sql\nSELECT group#, thread#, bytes/1024/1024 MB, status FROM v$log;\n```";
             } else if (p.includes('lock') || p.includes('blocking')) {
-                return `SELECT l1.sid blocker_sid, l2.sid waiter_sid FROM v$lock l1, v$lock l2 WHERE l1.block = 1 AND l2.request > 0 AND l1.id1 = l2.id1;`;
+                return "```sql\nSELECT l1.sid blocker_sid, l2.sid waiter_sid FROM v$lock l1, v$lock l2 WHERE l1.block = 1 AND l2.request > 0 AND l1.id1 = l2.id1;\n```";
             }
             return `Hey, let's walk through this together. Since my live API link is resting right now, let's check the absolute basics first: Can you check your alert log for recent ORA- errors or run a quick ASH query to see what wait events are spiking? Tell me what you see!`;
         }
@@ -844,8 +1013,8 @@
 
             document.getElementById('generated-sql-output').innerText = 'A.D.A.M is generating enterprise Oracle SQL...';
             
-            const result = await callAiEngine(q, `You are an expert Oracle DBA. Write clean, production-safe Oracle SQL for version ${ver}. Return only the SQL inside a clear block or formatted text.`);
-            document.getElementById('generated-sql-output').innerText = result.text;
+            const result = await callAiEngine(q, `You are an expert Oracle DBA. Write clean, production-safe Oracle SQL for version ${ver}. Return the SQL inside a fenced \`\`\`sql code block, with a short plain-text explanation if useful.`);
+            document.getElementById('generated-sql-output').innerHTML = renderRichText(result.text);
         }
 
         function quickQuery(queryText) {
@@ -868,11 +1037,51 @@
             resBox.classList.remove('hidden');
             resBox.innerText = 'Analyzing query output...';
 
-            const result = await callAiEngine(out, 'Analyze this Oracle SQL output as a senior DBA mentor, explain bottlenecks clearly, and suggest the exact next diagnostic step.');
-            resBox.innerText = result.text;
+            const result = await callAiEngine(out, 'Analyze this Oracle SQL output as a senior DBA mentor, explain bottlenecks clearly, and suggest the exact next diagnostic step. Use fenced ```sql code blocks for any SQL you recommend.');
+            resBox.innerHTML = renderRichText(result.text);
         }
 
-        // Guided Investigation Chat Functions (Senior Human DBA Persona)
+        // ---------- Ask A.D.A.M (General Q&A) ----------
+        async function sendAskMessage() {
+            const input = document.getElementById('ask-input');
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            const container = document.getElementById('ask-messages');
+            container.innerHTML += `
+                <div class="flex gap-3 justify-end">
+                    <div class="bg-red-600/20 border border-red-500/30 rounded-2xl p-4 text-white max-w-2xl">${renderInline(msg)}</div>
+                </div>`;
+
+            appState.askChatHistory.push({ role: 'user', content: msg });
+            input.value = '';
+            container.scrollTop = container.scrollHeight;
+
+            const generalMentorPrompt = "You are A.D.A.M, an expert Oracle DBA with deep knowledge of Oracle 19c/19.33 and 23ai architecture. Answer general questions clearly and conversationally: explain concepts, features, best practices, and version differences. This is a general knowledge Q&A channel, not an incident troubleshooting session, so keep answers informative and self-contained rather than asking the user to paste diagnostic output. Use fenced ```sql code blocks when sharing example SQL.";
+
+            const response = await callAiEngine(msg, generalMentorPrompt);
+            appState.askChatHistory.push({ role: 'assistant', content: response.text });
+
+            container.innerHTML += `
+                <div class="flex gap-3">
+                    <div class="w-8 h-8 rounded-xl bg-red-600/10 border border-red-500/20 flex items-center justify-center text-red-500 shrink-0"><i class="fa-solid fa-robot"></i></div>
+                    <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 text-slate-200 max-w-3xl">${renderRichText(response.text)}</div>
+                </div>`;
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function clearAskChat() {
+            document.getElementById('ask-messages').innerHTML = `
+                <div class="flex gap-3">
+                    <div class="w-8 h-8 rounded-xl bg-red-600/10 border border-red-500/20 flex items-center justify-center text-red-500 shrink-0"><i class="fa-solid fa-robot"></i></div>
+                    <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 text-slate-200 max-w-3xl leading-relaxed">
+                        <strong>Session reset.</strong> What would you like to know about Oracle architecture or best practices?
+                    </div>
+                </div>`;
+            appState.askChatHistory = [];
+        }
+
+        // ---------- Guided Investigation Chat Functions (Senior Human DBA Persona) ----------
         async function sendChatMessage() {
             const input = document.getElementById('chat-input');
             let msg = input.value.trim();
@@ -885,7 +1094,7 @@
             const container = document.getElementById('chat-messages');
             container.innerHTML += `
                 <div class="flex gap-3 justify-end">
-                    <div class="bg-red-600/20 border border-red-500/30 rounded-2xl p-4 text-white max-w-2xl whitespace-pre-wrap">${msg}</div>
+                    <div class="bg-red-600/20 border border-red-500/30 rounded-2xl p-4 text-white max-w-2xl">${renderInline(msg)}</div>
                 </div>`;
             
             appState.chatHistory.push({ role: 'user', content: msg });
@@ -893,7 +1102,7 @@
             removeAttachment();
             container.scrollTop = container.scrollHeight;
 
-            const seniorMentorPrompt = "You are A.D.A.M, an expert, senior Oracle DBA mentor with decades of production enterprise experience (Oracle 19.33 & 23ai RAC). Interact like an experienced, supportive senior human colleague. Never give generic, robotic canned responses or bulleted lists of random suggestions. Instead, guide the user step-by-step through their troubleshooting session: talk conversationally, ask probing questions about what they see in their environment, request specific query outputs (like v$session, v$process, ASH, or alert logs) when needed, analyze what they provide, explain the underlying Oracle mechanics calmly, and collaborate closely until you find the exact root cause and resolution.";
+            const seniorMentorPrompt = "You are A.D.A.M, an expert, senior Oracle DBA mentor with decades of production enterprise experience (Oracle 19.33 & 23ai RAC). Interact like an experienced, supportive senior human colleague. Never give generic, robotic canned responses or bulleted lists of random suggestions. Instead, guide the user step-by-step through their troubleshooting session: talk conversationally, ask probing questions about what they see in their environment, request specific query outputs (like v$session, v$process, ASH, or alert logs) when needed, analyze what they provide, explain the underlying Oracle mechanics calmly, and collaborate closely until you find the exact root cause and resolution. Use fenced ```sql code blocks for any SQL you ask the user to run.";
             
             const response = await callAiEngine(msg, seniorMentorPrompt);
             
@@ -902,7 +1111,7 @@
             container.innerHTML += `
                 <div class="flex gap-3">
                     <div class="w-8 h-8 rounded-xl bg-red-600/10 border border-red-500/20 flex items-center justify-center text-red-500 shrink-0"><i class="fa-solid fa-robot"></i></div>
-                    <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 text-slate-200 max-w-3xl leading-relaxed whitespace-pre-wrap">${response.text}</div>
+                    <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 text-slate-200 max-w-3xl">${renderRichText(response.text)}</div>
                 </div>`;
             container.scrollTop = container.scrollHeight;
         }
@@ -927,7 +1136,7 @@
             const ticketId = 'INC-' + Math.floor(100000 + Math.random() * 900000);
             const prompt = `Based on this collaborative troubleshooting conversation between the senior DBA mentor and team member, generate a formal Root Cause Analysis (RCA) document and ServiceNow closure notes:\n` + JSON.stringify(appState.chatHistory);
             
-            const result = await callAiEngine(prompt, 'You are an expert Oracle DBA. Write a formal, comprehensive RCA document including Incident Summary, Root Cause Analysis, Step-by-Step Resolution, and Preventive Actions.');
+            const result = await callAiEngine(prompt, 'You are an expert Oracle DBA. Write a formal, comprehensive RCA document including Incident Summary, Root Cause Analysis, Step-by-Step Resolution, and Preventive Actions. Use fenced ```sql code blocks for any SQL referenced.');
 
             const rcaDoc = {
                 id: ticketId,
@@ -968,7 +1177,7 @@
             const item = appState.rcaArchive[idx];
             document.getElementById('rca-viewer-title').innerText = `${item.id} — ${item.title}`;
             document.getElementById('rca-viewer-meta').innerText = `Created by: ${item.author} on ${item.date}`;
-            document.getElementById('rca-output-preview').innerText = item.text;
+            document.getElementById('rca-output-preview').innerHTML = renderRichText(item.text);
         }
 
         function copyRca() {
@@ -988,11 +1197,44 @@
             URL.revokeObjectURL(url);
         }
 
-        // Runbook Functions
+        // ---------- Multi-Phase DBA Runbooks ----------
         const runbooksData = {
-            blocking: { title: "Blocking Session Investigation", content: "1. Identify blockers:\nSELECT l1.sid blocker, l2.sid waiter FROM v$lock l1, v$lock l2 WHERE l1.block=1 AND l2.request>0 AND l1.id1=l2.id1;\n2. Terminate session:\nALTER SYSTEM KILL SESSION 'sid,serial# IMMEDIATE;" },
-            tablespace: { title: "Tablespace Full Remediation", content: "1. Check tablespace usage:\nSELECT tablespace_name, sum(bytes)/1024/1024 MB_used FROM dba_data_files GROUP BY tablespace_name;\n2. Add datafile:\nALTER TABLESPACE users ADD DATAFILE '/u01/app/oracle/oradata/prod/users02.dbf' SIZE 5G AUTOEXTEND ON NEXT 1G;" },
-            cpu: { title: "High CPU & ASH Wait Events", content: "1. Check top CPU sessions:\nSELECT sql_id, sum(cpu_time) FROM v$active_session_history WHERE session_state='ON CPU' GROUP BY sql_id ORDER BY 2 DESC;\n2. Inspect execution plan:\nSELECT * FROM table(dbms_xplan.display_cursor('sql_id'));" }
+            blocking: {
+                title: "Blocking Session Investigation & Resolution",
+                phases: [
+                    { name: "Triage", content: "Confirm the symptom before touching anything: users or jobs reporting hangs, timeouts, or a specific screen \"spinning\". Check the time it started and whether it correlates with a batch job, deployment, or reporting window. Identify the affected application module and severity (single user vs. whole application)." },
+                    { name: "Diagnostics", content: "Identify the blocking chain and how long it has been held:\n```sql\nSELECT l1.sid blocker_sid, s1.serial# blocker_serial, l2.sid waiter_sid, s1.username blocker_user, s1.program blocker_program\nFROM v$lock l1, v$lock l2, v$session s1\nWHERE l1.block = 1 AND l2.request > 0 AND l1.id1 = l2.id1 AND s1.sid = l1.sid;\n```\nCheck how long the blocking session has been idle and its last SQL:\n```sql\nSELECT sid, serial#, status, last_call_et, sql_id, event\nFROM v$session WHERE sid = &blocker_sid;\n```" },
+                    { name: "Remediation", content: "If the blocker is a genuinely stuck or abandoned session (confirmed with the application owner where possible), terminate it:\n```sql\nALTER SYSTEM KILL SESSION '&blocker_sid,&blocker_serial' IMMEDIATE;\n```\nIf the session does not clear, escalate to killing at the OS level using the corresponding SPID, or disconnect the session:\n```sql\nALTER SYSTEM DISCONNECT SESSION '&blocker_sid,&blocker_serial' IMMEDIATE;\n```" },
+                    { name: "Verification", content: "Re-run the blocking query to confirm the chain has cleared:\n```sql\nSELECT COUNT(*) FROM v$lock l1, v$lock l2 WHERE l1.block = 1 AND l2.request > 0 AND l1.id1 = l2.id1;\n```\nConfirm application responsiveness with the reporting user, and document the root cause (long-running transaction, missing commit, application bug) in the RCA archive for follow-up." }
+                ]
+            },
+            tablespace: {
+                title: "Tablespace Full Remediation",
+                phases: [
+                    { name: "Triage", content: "Confirm the alert: identify which tablespace triggered the space alert (ORA-01653/ORA-01654) and whether writes are currently failing. Determine if this is a Production, Staging, or Development environment to set urgency." },
+                    { name: "Diagnostics", content: "Check current tablespace usage and free space:\n```sql\nSELECT tablespace_name, ROUND(SUM(bytes)/1024/1024) MB_used\nFROM dba_data_files GROUP BY tablespace_name;\n\nSELECT tablespace_name, ROUND(SUM(bytes)/1024/1024) MB_free\nFROM dba_free_space GROUP BY tablespace_name;\n```\nCheck for autoextend limits already being hit and identify the largest space consumers (segments/tables):\n```sql\nSELECT segment_name, segment_type, ROUND(bytes/1024/1024) MB\nFROM dba_segments WHERE tablespace_name = '&TS_NAME' ORDER BY bytes DESC FETCH FIRST 10 ROWS ONLY;\n```" },
+                    { name: "Remediation", content: "Extend an existing datafile or add a new one:\n```sql\nALTER TABLESPACE &TS_NAME ADD DATAFILE '/u01/app/oracle/oradata/prod/&TS_NAME._02.dbf' SIZE 5G AUTOEXTEND ON NEXT 1G MAXSIZE 32G;\n```\nIf space is genuinely exhausted at the OS/ASM level, purge the recyclebin and reclaim unused space first:\n```sql\nPURGE DBA_RECYCLEBIN;\n```" },
+                    { name: "Verification", content: "Re-check free space to confirm headroom is restored:\n```sql\nSELECT tablespace_name, ROUND(SUM(bytes)/1024/1024) MB_free FROM dba_free_space GROUP BY tablespace_name;\n```\nConfirm the application can write successfully again, and set a proactive space-usage alert threshold to avoid recurrence." }
+                ]
+            },
+            cpu: {
+                title: "High CPU & ASH Top Wait Events",
+                phases: [
+                    { name: "Triage", content: "Confirm the alert source (OS-level CPU alert, AWR/OEM threshold, or user-reported slowness). Note the time window of the spike and whether it correlates with a batch job, new deployment, or optimizer plan change." },
+                    { name: "Diagnostics", content: "Identify top CPU-consuming SQL from Active Session History:\n```sql\nSELECT sql_id, COUNT(*) samples\nFROM v$active_session_history\nWHERE session_state = 'ON CPU' AND sample_time > SYSDATE - 1/24\nGROUP BY sql_id ORDER BY samples DESC FETCH FIRST 10 ROWS ONLY;\n```\nInspect the execution plan for the top offender to check for a bad plan or missing index:\n```sql\nSELECT * FROM table(dbms_xplan.display_cursor('&SQL_ID'));\n```" },
+                    { name: "Remediation", content: "If a plan regression is confirmed, consider a SQL Plan Baseline to pin the known-good plan, or add a missing index identified in diagnostics:\n```sql\nEXEC DBMS_SPM.LOAD_PLANS_FROM_CURSOR_CACHE(sql_id => '&SQL_ID');\n```\nFor a runaway session, consider resource-managing it via Database Resource Manager rather than killing it outright if it is business-critical." },
+                    { name: "Verification", content: "Re-sample ASH after the fix to confirm CPU usage has dropped:\n```sql\nSELECT session_state, COUNT(*) FROM v$active_session_history WHERE sample_time > SYSDATE - 10/1440 GROUP BY session_state;\n```\nConfirm host-level CPU utilization has normalized and document the finding (plan regression, missing index, resource contention) for the RCA." }
+                ]
+            },
+            archivelog: {
+                title: "FRA / Archive Log Destination Full",
+                phases: [
+                    { name: "Triage", content: "Confirm the symptom: database hang on commit, ORA-19809 or ORA-00257 in the alert log, or an explicit Fast Recovery Area (FRA) space alert. This is a high-urgency issue since the instance may stall if archiving cannot proceed." },
+                    { name: "Diagnostics", content: "Check FRA usage and reclaimable space:\n```sql\nSELECT name, space_limit/1024/1024 MB_limit, space_used/1024/1024 MB_used, space_reclaimable/1024/1024 MB_reclaimable\nFROM v$recovery_file_dest;\n```\nCheck the oldest un-backed-up archived logs holding up space:\n```sql\nSELECT name, completion_time FROM v$archived_log WHERE backup_count = 0 ORDER BY completion_time FETCH FIRST 10 ROWS ONLY;\n```" },
+                    { name: "Remediation", content: "Back up and delete archived logs already applied/backed up via RMAN (never delete manually via OS):\n```sql\nRMAN> BACKUP ARCHIVELOG ALL DELETE INPUT;\nRMAN> DELETE ARCHIVELOG ALL COMPLETED BEFORE 'SYSDATE-1' BACKED UP 1 TIMES TO DEVICE TYPE DISK;\n```\nIf space is still critical, temporarily increase the FRA size limit to relieve pressure while backups catch up:\n```sql\nALTER SYSTEM SET db_recovery_file_dest_size = 200G SCOPE=BOTH;\n```" },
+                    { name: "Verification", content: "Re-check FRA usage to confirm reclaimed space and headroom:\n```sql\nSELECT space_used/1024/1024 MB_used, space_limit/1024/1024 MB_limit FROM v$recovery_file_dest;\n```\nConfirm the alert log shows archiving proceeding normally, and review the RMAN backup schedule/retention policy so the FRA does not fill again." }
+                ]
+            }
         };
 
         function loadRunbookModal(type) {
@@ -1001,7 +1243,15 @@
             switchTab('runbooks');
             document.getElementById('runbook-viewer').classList.remove('hidden');
             document.getElementById('runbook-title').innerText = rb.title;
-            document.getElementById('runbook-content').innerText = rb.content;
+            document.getElementById('runbook-content').innerHTML = rb.phases.map((p, idx) => `
+                <div class="border border-slate-800 rounded-xl overflow-hidden">
+                    <div class="bg-slate-950 px-4 py-2 flex items-center gap-2 border-b border-slate-800">
+                        <span class="w-5 h-5 rounded-full bg-red-600/20 text-red-400 text-[10px] font-bold flex items-center justify-center shrink-0">${idx + 1}</span>
+                        <span class="text-xs font-bold text-white uppercase tracking-wider">${p.name}</span>
+                    </div>
+                    <div class="p-4 text-xs text-slate-300">${renderRichText(p.content)}</div>
+                </div>
+            `).join('');
         }
 
         // Safety Checker
@@ -1013,8 +1263,8 @@
             res.classList.remove('hidden');
             res.innerText = 'Inspecting SQL for destructive statements...';
 
-            const result = await callAiEngine(sql, 'Inspect this SQL statement for missing WHERE clauses, destructive DML, and safety risks. Provide a risk rating (SAFE, MODERATE, CRITICAL).');
-            res.innerText = result.text;
+            const result = await callAiEngine(sql, 'Inspect this SQL statement for missing WHERE clauses, destructive DML, and safety risks. Provide a risk rating (SAFE, MODERATE, CRITICAL) and a brief explanation.');
+            res.innerHTML = renderRichText(result.text);
         }
 
         // Owner Controls, API Test & Team Keys
