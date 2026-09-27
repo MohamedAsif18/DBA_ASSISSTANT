@@ -88,7 +88,7 @@
                     <div>
                         <div class="flex items-center gap-2">
                             <span class="font-bold text-base tracking-tight text-white">A.D.A.M</span>
-                            <span class="bg-red-500/10 text-red-400 border border-red-500/20 text-[10px] font-semibold px-2 py-0.5 rounded-full">Enterprise v5.7</span>
+                            <span class="bg-red-500/10 text-red-400 border border-red-500/20 text-[10px] font-semibold px-2 py-0.5 rounded-full">Enterprise v5.8</span>
                         </div>
                         <div class="text-[11px] text-slate-400 flex items-center gap-1.5">
                             <span>Automated Database Analysis & Monitoring (Multi-API Hybrid Engine)</span>
@@ -760,10 +760,10 @@
             let geminiFailed = false;
             let groqFailed = false;
             
-            // Try Gemini First if configured (using stable gemini-1.5-flash)
+            // Try Gemini First if configured (using stable gemini-2.0-flash)
             if (appState.geminiKey) {
                 try {
-                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${appState.geminiKey}`, {
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${appState.geminiKey}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -773,7 +773,7 @@
                     if (res.ok) {
                         const data = await res.json();
                         const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-                        if (text) return { text, provider: 'Gemini (1.5 Flash)' };
+                        if (text) return { text, provider: 'Gemini (2.0 Flash)' };
                     } else {
                         geminiFailed = true;
                     }
@@ -1036,7 +1036,7 @@
 
             if (appState.geminiKey) {
                 try {
-                    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${appState.geminiKey}`, {
+                    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${appState.geminiKey}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ contents: [{ parts: [{ text: 'Ping test' }] }] })
