@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="dark" style="background:#020617">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -49,7 +49,7 @@
                     <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Access Portal / Key</label>
                     <div class="relative">
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500"><i class="fa-solid fa-key"></i></span>
-                        <input type="password" id="login-key-input" onkeydown="if(event.key==='Enter') handleLogin()" placeholder="Enter Owner Password or Team Key..." 
+                        <input type="password" id="login-key-input" placeholder="Enter Owner Password or Team Key..." 
                             class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 pl-10 text-sm text-white focus:outline-none focus:border-red-500 transition-all font-mono">
                     </div>
                 </div>
@@ -615,7 +615,10 @@
                             </div>
                             </div>
                             <div class="bg-slate-950 border border-slate-800/80 rounded-xl p-3 text-[11px] text-slate-400 leading-relaxed">
-                                <strong class="text-slate-300">Cloud keys:</strong> new keys are saved to your Firebase database and work instantly on any device. Share the site link plus the key. Revoke disables a key everywhere.</div>
+                                <strong class="text-slate-300">Static site, no backend:</strong> a new key only works in this browser at first.
+                                <span class="text-emerald-400 font-semibold">① Export Team Keys</span> → paste into <code class="font-mono text-red-300">EMBEDDED_TEAM_KEYS</code> in the source → commit & push to GitHub, so everyone can use your one shared link and type in their own key, permanently.
+                                <span class="text-blue-400 font-semibold">② Copy Invite Link</span> (per row below) → works instantly on any device, no redeploy needed, but only for that one key.
+                            </div>
                             <div class="overflow-x-auto">
                                 <table class="w-full text-left text-xs font-mono">
                                     <thead>
@@ -678,57 +681,10 @@
         // keys immediately when typed in — no per-person invite links required.
         // Use "Export Team Keys" in the Owner & API Control tab to regenerate this list.
         // ============================================================================
-        const EMBEDDED_TEAM_KEYS = [];
-
-        const CLOUD = { dbUrl: 'https://adam-18227-default-rtdb.firebaseio.com', webApiKey: 'AIzaSyCkBv567Enz_Z4176DKhIbVOAmvM18Xn0M', ownerEmail: 'mohamedasif5off@gmail.com' };
-        let ownerToken = null, ownerPass = '';
-        const dbBase = () => CLOUD.dbUrl.replace(/\/$/, '');
-
-        async function fbSignIn(email, password) {
-            try {
-                const r = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${CLOUD.webApiKey}`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password, returnSecureToken: true })
-                });
-                return r.ok ? (await r.json()).idToken : null;
-            } catch (e) { return null; }
-        }
-        async function fbGet(path) {
-            try { const r = await fetch(`${dbBase()}/${path}.json`); return r.ok ? await r.json() : null; }
-            catch (e) { return null; }
-        }
-        async function fbOwner(method, path, body) {
-            for (let i = 0; i < 2; i++) {
-                try {
-                    const r = await fetch(`${dbBase()}/${path}.json?auth=${ownerToken}`, {
-                        method, headers: { 'Content-Type': 'application/json' },
-                        body: body === undefined ? undefined : JSON.stringify(body)
-                    });
-                    if (r.status === 401 && i === 0) { ownerToken = await fbSignIn(CLOUD.ownerEmail, ownerPass); continue; }
-                    return r.ok ? await r.json() : null;
-                } catch (e) { return null; }
-            }
-            return null;
-        }
-        function fbBump(key, n) {
-            fetch(`${dbBase()}/teamKeys/${encodeURIComponent(key)}/requests.json`, {
-                method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(n)
-            }).catch(() => {});
-        }
-        async function loadCloudOwnerData() {
-            const cfg = await fbOwner('GET', 'ownerConfig');
-            if (cfg) { appState.geminiKey = cfg.gemini || appState.geminiKey; appState.groqKey = cfg.groq || appState.groqKey; }
-            const keys = await fbOwner('GET', 'teamKeys');
-            appState.teamKeys = keys ? Object.entries(keys).map(([k, v]) => ({
-                key: k, name: v.name, role: v.role || 'Senior DBA Team Member', requests: v.requests || 0, active: v.active === true
-            })) : [];
-        }
-        function withHistory(hist, msg) {
-            const prev = hist.slice(0, -1).slice(-10);
-            if (!prev.length) return msg;
-            return 'Conversation so far:\n' + prev.map(m => (m.role === 'user' ? 'DBA' : 'A.D.A.M') + ': ' + String(m.content).slice(0, 3000)).join('\n\n') + '\n\nLatest message from the DBA:\n' + msg;
-        }
-
+        const EMBEDDED_TEAM_KEYS = [
+            { Key: "ADAM-TEAM-75KEYX", name: "Saravanan", role: "Senior DBA Team Member", requests: 0, active: true }
+            // { key: "ADAM-TEAM-ZRBT6C", name: "Jane Doe", role: "Senior DBA Team Member", requests: 0, active: true },
+        ];
 
         function mergeTeamKeys() {
             const stored = JSON.parse(localStorage.getItem('adam_team_keys') || '[]');
@@ -745,7 +701,7 @@
             role: null, // 'owner' or 'team'
             currentKey: '',
             currentName: '',
-            ownerPassword: localStorage.getItem('adam_owner_pass') || '',
+            ownerPassword: localStorage.getItem('adam_owner_pass') || 'ASIF-OWNER-2026',
             geminiKey: localStorage.getItem('adam_gemini_key') || '',
             groqKey: localStorage.getItem('adam_groq_key') || '',
             targetDb: localStorage.getItem('adam_target_db') || null,
@@ -812,34 +768,31 @@
         }
 
         // Authentication Handler
-                async function handleLogin() {
+        function handleLogin() {
             const val = document.getElementById('login-key-input').value.trim();
             const err = document.getElementById('login-error');
-            err.classList.add('hidden');
-            if (!val) return;
-            if (val.startsWith('ADAM-TEAM-')) {
-                const rec = await fbGet('teamKeys/' + encodeURIComponent(val));
-                if (rec && rec.active === true) {
-                    appState.role = 'team'; appState.currentKey = val; appState.currentName = rec.name;
-                    appState.geminiKey = rec.gemini || ''; appState.groqKey = rec.groq || '';
-                    appState.teamKeys = [{ key: val, name: rec.name, requests: rec.requests || 0, active: true }];
-                    return startApp();
-                }
+            
+            if (val === appState.ownerPassword) {
+                appState.role = 'owner';
+                appState.currentKey = 'OWNER-MASTER';
+                appState.currentName = 'Master Owner (Mohamed Asif)';
+                startApp();
             } else {
-                const tok = await fbSignIn(CLOUD.ownerEmail, val);
-                if (tok) {
-                    ownerToken = tok; ownerPass = val;
-                    appState.role = 'owner'; appState.currentKey = 'OWNER-MASTER';
-                    appState.currentName = 'Master Owner (Mohamed Asif)';
-                    await loadCloudOwnerData();
-                    return startApp();
+                const found = appState.teamKeys.find(k => k.key === val && k.active);
+                if (found) {
+                    appState.role = 'team';
+                    appState.currentKey = found.key;
+                    appState.currentName = found.name;
+                    found.requests = (found.requests || 0) + 1;
+                    saveState();
+                    startApp();
+                } else {
+                    err.classList.remove('hidden');
                 }
             }
-            err.classList.remove('hidden');
         }
 
         function handleLogout() {
-            ownerToken = null; ownerPass = ''; appState.geminiKey = ''; appState.groqKey = '';
             appState.role = null;
             appState.currentKey = '';
             appState.currentName = '';
@@ -878,7 +831,6 @@
 
         // Navigation Switcher
         function switchTab(tabId) {
-            if (tabId === 'owner' && appState.role === 'owner') loadCloudOwnerData().then(renderTeamKeysTable);
             ['query', 'ask', 'chat', 'rca', 'runbooks', 'learning', 'safety', 'owner'].forEach(t => {
                 const el = document.getElementById('tab-' + t);
                 const btn = document.getElementById('nav-btn-' + t);
@@ -899,8 +851,8 @@
             const dbName = document.getElementById('modal-db-name').value.trim();
             const env = document.getElementById('modal-db-env').value;
             if (dbName) {
-                appState.targetDb = `${dbName} (${env})`;
-                localStorage.setItem('adam_target_db', appState.targetDb);
+                appState.targetdb = `${dbName} (${env})`;
+                localStorage.setItem('adam_target_db', appState.targetdb);
                 updateDbHeader();
                 closeDbModal();
             }
@@ -909,8 +861,8 @@
             const label = document.getElementById('header-db-label');
             const status = document.getElementById('header-db-status');
             const badge = document.getElementById('sidebar-db-badge');
-            if (appState.targetDb) {
-                label.innerText = appState.targetDb;
+            if (appState.targetdb) {
+                label.innerText = appState.targetdb;
                 status.className = 'w-2 h-2 rounded-full bg-emerald-500 animate-pulse';
                 badge.innerText = 'Connected';
                 badge.className = 'text-emerald-400 font-mono';
@@ -987,7 +939,7 @@
             appState.rateLimited = true;
             appState.rateLimitCountdown = 60; // 60 seconds cooldown timer
             
-            
+            document.getElementById('app-body').classList.add('bg-amber-950/30');
             document.getElementById('rate-limit-banner').classList.remove('hidden');
 
             if (appState.rateLimitTimer) clearInterval(appState.rateLimitTimer);
@@ -999,7 +951,7 @@
                 if (appState.rateLimitCountdown <= 0) {
                     clearInterval(appState.rateLimitTimer);
                     appState.rateLimited = false;
-                    
+                    document.getElementById('app-body').classList.remove('bg-amber-950/30');
                     document.getElementById('rate-limit-banner').classList.add('hidden');
                 }
             }, 1000);
@@ -1142,7 +1094,7 @@
 
             const generalMentorPrompt = "You are A.D.A.M, an expert Oracle DBA with deep knowledge of Oracle 19c (currently patched to Release Update 19.32, with 19.33 scheduled for October 20, 2026) and 23ai architecture. Answer general questions clearly and conversationally: explain concepts, features, best practices, and version differences. This is a general knowledge Q&A channel, not an incident troubleshooting session, so keep answers informative and self-contained rather than asking the user to paste diagnostic output. Use fenced ```sql code blocks when sharing example SQL.";
 
-            const response = await callAiEngine(withHistory(appState.askChatHistory, msg), generalMentorPrompt);
+            const response = await callAiEngine(msg, generalMentorPrompt);
             appState.askChatHistory.push({ role: 'assistant', content: response.text });
 
             container.innerHTML += `
@@ -1187,7 +1139,7 @@
 
             const seniorMentorPrompt = "You are A.D.A.M, an expert, senior Oracle DBA mentor with decades of production enterprise experience (Oracle 19.32-patched 19c & 23ai RAC). Interact like an experienced, supportive senior human colleague. Never give generic, robotic canned responses or bulleted lists of random suggestions. Instead, guide the user step-by-step through their troubleshooting session: talk conversationally, ask probing questions about what they see in their environment, request specific query outputs (like v$session, v$process, ASH, or alert logs) when needed, analyze what they provide, explain the underlying Oracle mechanics calmly, and collaborate closely until you find the exact root cause and resolution. Use fenced ```sql code blocks for any SQL you ask the user to run.";
             
-            const response = await callAiEngine(withHistory(appState.chatHistory, msg), seniorMentorPrompt);
+            const response = await callAiEngine(msg, seniorMentorPrompt);
             
             appState.chatHistory.push({ role: 'assistant', content: response.text });
 
@@ -1351,15 +1303,12 @@
         }
 
         // Owner Controls, API Test & Team Keys
-                async function saveApiKeys() {
+        function saveApiKeys() {
             appState.geminiKey = document.getElementById('owner-gemini-key').value.trim();
             appState.groqKey = document.getElementById('owner-groq-key').value.trim();
             localStorage.setItem('adam_gemini_key', appState.geminiKey);
             localStorage.setItem('adam_groq_key', appState.groqKey);
-            await fbOwner('PUT', 'ownerConfig', { gemini: appState.geminiKey, groq: appState.groqKey });
-            for (const k of appState.teamKeys.filter(k => k.active))
-                await fbOwner('PATCH', 'teamKeys/' + k.key, { gemini: appState.geminiKey, groq: appState.groqKey });
-            alert('API keys saved and synced. Team members pick them up automatically.');
+            alert('API Keys saved successfully!');
         }
 
         async function testApiKeys() {
@@ -1395,19 +1344,14 @@
             resBox.innerHTML = `Gemini: <span class="${geminiStatus.includes('SUCCESS')?'text-emerald-400':'text-red-400'}">${geminiStatus}</span><br>Groq: <span class="${groqStatus.includes('SUCCESS')?'text-emerald-400':'text-red-400'}">${groqStatus}</span>`;
         }
 
-                async function updateOwnerPassword() {
+        function updateOwnerPassword() {
             const pass = document.getElementById('owner-new-password').value.trim();
-            if (pass.length < 6) { alert('Use at least 6 characters.'); return; }
-            try {
-                const r = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:update?key=${CLOUD.webApiKey}`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ idToken: ownerToken, password: pass, returnSecureToken: true })
-                });
-                if (!r.ok) throw new Error();
-                ownerToken = (await r.json()).idToken; ownerPass = pass;
+            if (pass) {
+                appState.ownerPassword = pass;
+                localStorage.setItem('adam_owner_pass', pass);
+                alert('Owner password updated successfully!');
                 document.getElementById('owner-new-password').value = '';
-                alert('Owner password updated on all devices.');
-            } catch (e) { alert('Password update failed.'); }
+            }
         }
 
         // Copies the current team key list as ready-to-paste JS. Paste it over the
@@ -1427,20 +1371,15 @@
             alert('Team key list copied!\n\nPaste this over the EMBEDDED_TEAM_KEYS array near the top of the <script> in index.html, then commit & push to GitHub Pages.\n\nOnce deployed, everyone can open your single shared link and type in their own key from any device — no invite links needed.');
         }
 
-                async function generateTeamKey() {
+        function generateTeamKey() {
             const name = prompt("Enter team member's full name:");
             if (!name) return;
-            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-            const newKey = 'ADAM-TEAM-' + Array.from(crypto.getRandomValues(new Uint8Array(8)), b => chars[b % 32]).join('');
-            const ok = await fbOwner('PUT', 'teamKeys/' + newKey, {
-                name, role: 'Senior DBA Team Member', requests: 0, active: true,
-                gemini: appState.geminiKey, groq: appState.groqKey
-            });
-            if (ok === null) { alert('Could not save to the cloud. Check your Firebase rules and owner login.'); return; }
-            appState.teamKeys.push({ key: newKey, name, role: 'Senior DBA Team Member', requests: 0, active: true });
+            const newKey = 'ADAM-TEAM-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+            appState.teamKeys.push({ key: newKey, name: name, role: 'Senior DBA Team Member', requests: 0, active: true });
+            saveState();
             renderTeamKeysTable();
-            navigator.clipboard.writeText(newKey);
-            alert(`Key for ${name}: ${newKey}\n\nCopied. It works immediately on any device. Share the site link and this key.`);
+            const shareNow = confirm(`Key generated for ${name}: ${newKey}\n\nThis key only works on THIS browser until you export it and redeploy to GitHub (click OK to copy an instant cross-device invite link instead, or Cancel to export later via "Export Team Keys").`);
+            if (shareNow) copyInviteLink(newKey, name);
         }
 
         // Team keys live only in this browser's localStorage (there is no backend),
@@ -1455,7 +1394,7 @@
 
         function copyTeamKeyOnly(key) {
             navigator.clipboard.writeText(key);
-            alert('Key copied to clipboard!');
+            alert('Key copied to clipboard! Note: typing this key in only works on THIS browser — use "Copy Invite Link" to share access across devices.');
         }
 
         // If this page was opened via an invite link (?key=...), authenticate the
@@ -1487,10 +1426,9 @@
             return true;
         }
 
-                async function revokeTeamKey(idx) {
-            const k = appState.teamKeys[idx];
-            if (await fbOwner('PATCH', 'teamKeys/' + k.key, { active: false }) === null) { alert('Cloud update failed.'); return; }
-            k.active = false;
+        function revokeTeamKey(idx) {
+            appState.teamKeys[idx].active = false;
+            saveState();
             renderTeamKeysTable();
         }
 
@@ -1502,7 +1440,7 @@
             }
             tbody.innerHTML = appState.teamKeys.map((k, idx) => `
                 <tr class="border-b border-slate-800/60 ${!k.active ? 'opacity-40' : ''}">
-                    <td class="py-3 px-3 font-bold text-white">${escapeHtml(k.name)}</td>
+                    <td class="py-3 px-3 font-bold text-white">${k.name}</td>
                     <td class="py-3 px-3 font-mono text-red-400">${k.key}</td>
                     <td class="py-3 px-3">${k.requests || 0}</td>
                     <td class="py-3 px-3">${(k.requests || 0) * 450} tokens</td>
@@ -1518,12 +1456,14 @@
             `).join('');
         }
 
-                function trackUsage() {
-            if (appState.role !== 'team') return;
-            const f = appState.teamKeys.find(k => k.key === appState.currentKey);
-            if (!f) return;
-            f.requests = (f.requests || 0) + 1;
-            fbBump(f.key, f.requests);
+        function trackUsage() {
+            if (appState.role === 'team') {
+                const found = appState.teamKeys.find(k => k.key === appState.currentKey);
+                if (found) {
+                    found.requests = (found.requests || 0) + 1;
+                    saveState();
+                }
+            }
         }
 
         function saveState() {
@@ -1532,13 +1472,7 @@
         }
 
         // Auto-login if this page was opened via a team invite link.
-        (function () {
-            const k = new URLSearchParams(location.search).get('key');
-            if (!k) return;
-            document.getElementById('login-key-input').value = k;
-            history.replaceState({}, document.title, location.origin + location.pathname);
-            handleLogin();
-        })();
+        checkInviteLink();
     </script>
 </body>
 </html>
