@@ -78,6 +78,15 @@
             <span class="text-[10px] bg-amber-500/30 px-2 py-0.5 rounded text-amber-200">Fallback Active</span>
         </div>
 
+        <!-- OWNER ONBOARDING BANNER: shown only when no AI keys are configured yet -->
+        <div id="onboarding-banner" class="hidden bg-blue-500/15 border-b border-blue-500/30 px-6 py-2.5 flex items-center justify-between text-xs text-blue-300 z-40">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-circle-info"></i>
+                <span>No AI provider is configured yet, so A.D.A.M is running in offline fallback mode. Add a Gemini or Groq key to unlock full answers.</span>
+            </div>
+            <button onclick="switchTab('owner')" class="text-[10px] bg-blue-500/30 hover:bg-blue-500/50 px-2 py-1 rounded transition-all font-semibold">Configure Now</button>
+        </div>
+
         <!-- HEADER -->
         <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-40 px-6 py-3 flex items-center justify-between">
             <div class="flex items-center gap-4">
@@ -100,6 +109,9 @@
             </div>
 
             <div class="flex items-center gap-3">
+                <button onclick="toggleMobileNav()" class="lg:hidden bg-slate-800 hover:bg-slate-700 text-slate-200 w-8 h-8 rounded-xl text-sm transition-all border border-slate-700 flex items-center justify-center">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
                 <div class="hidden md:flex items-center gap-2 bg-slate-950 border border-slate-800 rounded-full px-3 py-1 text-xs">
                     <span id="header-db-status" class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
                     <span id="header-db-label" class="text-slate-300 font-medium">No DB Configured</span>
@@ -108,11 +120,14 @@
                     <i class="fa-solid fa-shield-halved text-red-500"></i>
                     <span id="header-role-label">Role: Senior DBA</span>
                 </div>
-                <button onclick="switchTab('safety')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-xl text-xs font-medium transition-all flex items-center gap-1.5 border border-slate-700">
+                <button onclick="toggleTheme()" title="Toggle light/dark theme" class="bg-slate-900 hover:bg-slate-800 text-slate-300 w-8 h-8 rounded-xl text-sm transition-all border border-slate-800 flex items-center justify-center">
+                    <i id="theme-toggle-icon" class="fa-solid fa-moon"></i>
+                </button>
+                <button onclick="switchTab('safety')" class="hidden sm:flex bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-xl text-xs font-medium transition-all items-center gap-1.5 border border-slate-700">
                     <i class="fa-solid fa-triangle-exclamation text-amber-400"></i>
                     <span class="hidden sm:inline">Safety Check</span>
                 </button>
-                <button onclick="switchTab('ask')" class="bg-red-600 hover:bg-red-500 text-white px-3.5 py-1.5 rounded-xl text-xs font-medium transition-all shadow-lg shadow-red-600/20 flex items-center gap-1.5">
+                <button onclick="switchTab('ask')" class="hidden sm:flex bg-red-600 hover:bg-red-500 text-white px-3.5 py-1.5 rounded-xl text-xs font-medium transition-all shadow-lg shadow-red-600/20 items-center gap-1.5">
                     <i class="fa-solid fa-comments"></i>
                     <span>Ask A.D.A.M</span>
                 </button>
@@ -122,6 +137,24 @@
                 </button>
             </div>
         </header>
+
+        <!-- MOBILE NAV DRAWER -->
+        <div id="mobile-nav-drawer" class="hidden lg:hidden fixed inset-0 z-40 bg-slate-950/90 backdrop-blur-sm" onclick="if(event.target===this) closeMobileNav()">
+            <div class="bg-slate-900 border-r border-slate-800 w-64 h-full p-4 space-y-1 overflow-y-auto">
+                <div class="flex items-center justify-between px-3 mb-2">
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Navigation</span>
+                    <button onclick="closeMobileNav()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <button onclick="switchTab('query')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800/80 transition-all text-left"><i class="fa-solid fa-terminal w-4 text-red-500"></i>Query Assistant</button>
+                <button onclick="switchTab('ask')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800/80 transition-all text-left"><i class="fa-solid fa-comments w-4 text-red-500"></i>Ask A.D.A.M</button>
+                <button onclick="switchTab('chat')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800/80 transition-all text-left"><i class="fa-solid fa-brain w-4 text-red-500"></i>Guided Investigation</button>
+                <button onclick="switchTab('rca')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800/80 transition-all text-left"><i class="fa-solid fa-file-shield w-4 text-red-500"></i>RCA Archive & Reports</button>
+                <button onclick="switchTab('runbooks')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800/80 transition-all text-left"><i class="fa-solid fa-book-medical w-4 text-red-500"></i>DBA Runbooks</button>
+                <button onclick="switchTab('learning')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800/80 transition-all text-left"><i class="fa-solid fa-graduation-cap w-4 text-red-500"></i>Learning Center</button>
+                <button onclick="switchTab('safety')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800/80 transition-all text-left"><i class="fa-solid fa-shield-virus w-4 text-red-500"></i>SQL Safety Checker</button>
+                <button onclick="switchTab('owner')" id="mobile-nav-btn-owner" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-slate-300 hover:bg-slate-800/80 transition-all text-left border-t border-slate-800/80 mt-2 pt-3"><i class="fa-solid fa-user-gear w-4 text-amber-500"></i>Owner & API Control</button>
+            </div>
+        </div>
 
         <!-- BODY LAYOUT -->
         <div class="flex-1 flex">
@@ -227,7 +260,7 @@
                                     <div class="flex gap-2">
                                         <input type="text" id="natural-query-input" placeholder="e.g., how to check redo log size or find blocking locks..." 
                                             class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-red-500">
-                                        <button onclick="generateSql()" class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-medium px-5 py-3 rounded-xl transition-all shadow-lg shadow-red-600/20 flex items-center gap-2 text-sm">
+                                        <button id="generate-sql-btn" onclick="generateSql()" class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-medium px-5 py-3 rounded-xl transition-all shadow-lg shadow-red-600/20 flex items-center gap-2 text-sm">
                                             <i class="fa-solid fa-wand-magic-sparkles"></i>
                                             <span>Generate SQL</span>
                                         </button>
@@ -255,7 +288,7 @@
                                 </h3>
                                 <textarea id="query-output-paste" placeholder="Paste SQL query execution output here to let A.D.A.M explain what the result means and suggest the next diagnostic step..." 
                                     class="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs font-mono text-slate-300 h-28 focus:outline-none focus:border-red-500"></textarea>
-                                <button onclick="analyzeQueryOutput()" class="bg-slate-800 hover:bg-slate-700 text-white font-medium px-4 py-2.5 rounded-xl text-xs transition-all border border-slate-700 flex items-center gap-2">
+                                <button id="analyze-output-btn" onclick="analyzeQueryOutput()" class="bg-slate-800 hover:bg-slate-700 text-white font-medium px-4 py-2.5 rounded-xl text-xs transition-all border border-slate-700 flex items-center gap-2">
                                     <i class="fa-solid fa-magnifying-glass-chart text-red-400"></i> Analyze Output with A.D.A.M
                                 </button>
                                 <div id="query-analysis-result" class="bg-slate-950 border border-slate-800/80 rounded-xl p-4 text-xs text-slate-300 hidden"></div>
@@ -316,7 +349,7 @@
                             <input type="text" id="ask-input" placeholder="Ask a general Oracle question..." 
                                 onkeydown="if(event.key==='Enter') sendAskMessage()"
                                 class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-red-500 font-mono">
-                            <button onclick="sendAskMessage()" class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white px-6 py-3 rounded-xl text-xs font-medium transition-all shadow-lg shadow-red-600/20 flex items-center gap-2">
+                            <button id="ask-send-btn" onclick="sendAskMessage()" class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white px-6 py-3 rounded-xl text-xs font-medium transition-all shadow-lg shadow-red-600/20 flex items-center gap-2">
                                 <i class="fa-solid fa-paper-plane"></i> Send
                             </button>
                         </div>
@@ -367,7 +400,7 @@
                             <input type="text" id="chat-input" placeholder="Talk to your senior DBA mentor or paste query output..." 
                                 onkeydown="if(event.key==='Enter') sendChatMessage()"
                                 class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-red-500 font-mono">
-                            <button onclick="sendChatMessage()" class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white px-6 py-3 rounded-xl text-xs font-medium transition-all shadow-lg shadow-red-600/20 flex items-center gap-2">
+                            <button id="chat-send-btn" onclick="sendChatMessage()" class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white px-6 py-3 rounded-xl text-xs font-medium transition-all shadow-lg shadow-red-600/20 flex items-center gap-2">
                                 <i class="fa-solid fa-paper-plane"></i> Send
                             </button>
                         </div>
@@ -380,7 +413,7 @@
                         <h2 class="text-xl font-bold text-white flex items-center gap-2">
                             <i class="fa-solid fa-file-shield text-red-500"></i> RCA Archive & Reports Dashboard
                         </h2>
-                        <p class="text-xs text-slate-400 mt-1">Review, view, and download formal Root Cause Analysis reports generated automatically from resolved guided investigations.</p>
+                        <p class="text-xs text-slate-400 mt-1">Review, view, and download formal Root Cause Analysis reports generated automatically from resolved guided investigations. Shared across the whole team.</p>
                     </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -389,6 +422,7 @@
                                 <span>Archived RCA Reports</span>
                                 <span class="bg-red-500/10 text-red-400 text-xs px-2 py-0.5 rounded-full font-mono" id="rca-count">0</span>
                             </h3>
+                            <input type="text" id="rca-search-input" oninput="renderRcaArchive()" placeholder="Search by title, author or keyword..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500">
                             <div id="rca-archive-list" class="space-y-2 max-h-[420px] overflow-y-auto text-xs">
                                 <div class="text-slate-500 italic">No archived RCAs yet. Conclude a guided investigation to generate one.</div>
                             </div>
@@ -402,7 +436,8 @@
                                 </div>
                                 <div class="flex gap-2">
                                     <button onclick="copyRca()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded-xl border border-slate-700 transition-all flex items-center gap-1.5"><i class="fa-regular fa-copy"></i> Copy</button>
-                                    <button onclick="downloadRca()" class="bg-red-600 hover:bg-red-500 text-white text-xs px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5"><i class="fa-solid fa-download"></i> Download</button>
+                                    <button onclick="downloadRca()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded-xl border border-slate-700 transition-all flex items-center gap-1.5"><i class="fa-solid fa-file-lines"></i> .txt</button>
+                                    <button onclick="printRca()" class="bg-red-600 hover:bg-red-500 text-white text-xs px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5"><i class="fa-solid fa-print"></i> PDF / Print</button>
                                 </div>
                             </div>
                             <div id="rca-output-preview" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs text-slate-300 min-h-[320px] overflow-y-auto">-- Select an archived RCA document above to inspect full diagnostic findings, root cause, and ServiceNow closure notes.</div>
@@ -412,14 +447,17 @@
 
                 <!-- 4. DBA RUNBOOKS TAB -->
                 <div id="tab-runbooks" class="space-y-6 hidden">
-                    <div class="bg-gradient-to-r from-slate-900 to-slate-900/60 border border-slate-800 rounded-2xl p-6">
-                        <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                            <i class="fa-solid fa-book-medical text-red-500"></i> Interactive DBA Runbooks
-                        </h2>
-                        <p class="text-xs text-slate-400 mt-1">Multi-phase operational runbooks (Triage → Diagnostics → Remediation → Verification) for critical Oracle DBA tasks and emergency recovery.</p>
+                    <div class="bg-gradient-to-r from-slate-900 to-slate-900/60 border border-slate-800 rounded-2xl p-6 flex items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-book-medical text-red-500"></i> Interactive DBA Runbooks
+                            </h2>
+                            <p class="text-xs text-slate-400 mt-1">Multi-phase operational runbooks (Triage → Diagnostics → Remediation → Verification) for critical Oracle DBA tasks and emergency recovery.</p>
+                        </div>
+                        <button id="add-runbook-btn" onclick="openRunbookEditor()" class="hidden bg-amber-600 hover:bg-amber-500 text-white px-3 py-2 rounded-xl text-xs font-medium transition-all shrink-0 flex items-center gap-1.5"><i class="fa-solid fa-plus"></i> Add Runbook</button>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div id="runbook-cards" class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4 shadow-xl">
                             <div class="w-10 h-10 rounded-xl bg-red-600/10 text-red-500 border border-red-500/20 flex items-center justify-center font-bold">01</div>
                             <h3 class="text-sm font-bold text-white">Blocking Session Killer</h3>
@@ -539,9 +577,10 @@
                     </div>
 
                     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4 shadow-xl">
-                        <textarea id="safety-sql-input" placeholder="Paste SQL statement here to scan for risk level..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs font-mono text-slate-300 h-32 focus:outline-none focus:border-red-500"></textarea>
-                        <button onclick="runSafetyCheck()" class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-medium px-5 py-3 rounded-xl text-xs transition-all shadow-lg shadow-red-600/20">
-                            Run Safety Inspection
+                        <textarea id="safety-sql-input" oninput="instantSafetyPrecheck()" placeholder="Paste SQL statement here to scan for risk level..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs font-mono text-slate-300 h-32 focus:outline-none focus:border-red-500"></textarea>
+                        <div id="safety-precheck" class="hidden text-xs font-semibold px-3 py-2 rounded-xl border"></div>
+                        <button id="run-safety-btn" onclick="runSafetyCheck()" class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-medium px-5 py-3 rounded-xl text-xs transition-all shadow-lg shadow-red-600/20">
+                            Run Full AI Safety Inspection
                         </button>
                         <div id="safety-result" class="bg-slate-950 border border-slate-800 rounded-xl p-4 text-xs text-slate-300 hidden"></div>
                     </div>
@@ -615,20 +654,22 @@
                             </div>
                             </div>
                             <div class="bg-slate-950 border border-slate-800/80 rounded-xl p-3 text-[11px] text-slate-400 leading-relaxed">
-                                <strong class="text-slate-300">Cloud keys:</strong> new keys are saved to your Firebase database and work instantly on any device. Share the site link plus the key. Revoke disables a key everywhere.</div>
+                                <strong class="text-slate-300">Cloud keys:</strong> new keys are saved to your Firebase database and work instantly on any device. Share the site link plus the key. Revoke disables a key everywhere. Estimated tokens now reflect real API usage where the provider reports it.</div>
                             <div class="overflow-x-auto">
                                 <table class="w-full text-left text-xs font-mono">
                                     <thead>
                                         <tr class="border-b border-slate-800 text-slate-500">
                                             <th class="py-2 px-3">Team Member Name</th>
                                             <th class="py-2 px-3">Assigned Key</th>
-                                            <th class="py-2 px-3">Requests Made</th>
-                                            <th class="py-2 px-3">Est. Tokens</th>
+                                            <th class="py-2 px-3">Role</th>
+                                            <th class="py-2 px-3">Expires</th>
+                                            <th class="py-2 px-3">Requests</th>
+                                            <th class="py-2 px-3">Tokens Used</th>
                                             <th class="py-2 px-3 text-right">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody id="team-keys-table-body" class="text-slate-300">
-                                        <tr><td colspan="5" class="py-4 text-center text-slate-500">No active team keys generated yet. Click generate above.</td></tr>
+                                        <tr><td colspan="7" class="py-4 text-center text-slate-500">No active team keys generated yet. Click generate above.</td></tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -745,6 +786,7 @@
             role: null, // 'owner' or 'team'
             currentKey: '',
             currentName: '',
+            readOnly: false,
             ownerPassword: localStorage.getItem('adam_owner_pass') || '',
             geminiKey: localStorage.getItem('adam_gemini_key') || '',
             groqKey: localStorage.getItem('adam_groq_key') || '',
@@ -752,13 +794,14 @@
             teamKeys: mergeTeamKeys(),
             rcaArchive: JSON.parse(localStorage.getItem('adam_rca_archive') || '[]'),
             currentRu: localStorage.getItem('adam_current_ru') || '',
-            chatHistory: [],
-            askChatHistory: [],
+            chatHistory: JSON.parse(localStorage.getItem('adam_chat_history') || '[]'),
+            askChatHistory: JSON.parse(localStorage.getItem('adam_ask_chat_history') || '[]'),
             attachedFileContent: null,
             attachedFileName: null,
             rateLimited: false,
             rateLimitCountdown: 0,
-            rateLimitTimer: null
+            rateLimitTimer: null,
+            customRunbooks: {}
         };
 
         // ---------- Rich Text / Markdown-lite Renderer ----------
@@ -784,7 +827,7 @@
             let html = '';
             for (let i = 0; i < parts.length; i += 3) {
                 const textSegment = parts[i];
-                if (textSegment) html += `<div class="leading-relaxed">${renderInline(textSegment)}</div>`;
+                if (textSegment) html += renderBlockText(textSegment);
                 if (parts[i + 1] !== undefined) {
                     const lang = (parts[i + 1] || 'sql').toUpperCase();
                     const code = (parts[i + 2] || '').replace(/^\n/, '').trim();
@@ -799,7 +842,55 @@
                         </div>`;
                 }
             }
-            return html || `<div class="leading-relaxed">${renderInline(String(raw))}</div>`;
+            return html || renderBlockText(String(raw));
+        }
+
+        // Handles markdown-lite block structure: headers, bullet/numbered lists, tables.
+        function renderBlockText(segment) {
+            const lines = segment.split('\n');
+            let html = '', i = 0;
+            const isTableRow = (l) => /^\s*\|.*\|\s*$/.test(l);
+            const isSeparatorRow = (l) => /^\s*\|?[\s:\-|]+\|?\s*$/.test(l) && l.includes('-');
+            while (i < lines.length) {
+                const line = lines[i];
+
+                // Table block
+                if (isTableRow(line) && lines[i + 1] && isSeparatorRow(lines[i + 1])) {
+                    const cells = (l) => l.trim().replace(/^\||\|$/g, '').split('|').map(c => c.trim());
+                    const header = cells(line);
+                    let j = i + 2, rows = [];
+                    while (j < lines.length && isTableRow(lines[j])) { rows.push(cells(lines[j])); j++; }
+                    html += `<div class="overflow-x-auto my-3"><table class="w-full text-left border-collapse text-xs"><thead><tr>${header.map(h => `<th class="border-b border-slate-700 px-2 py-1.5 text-slate-300 font-semibold">${renderInline(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr>${r.map(c => `<td class="border-b border-slate-800 px-2 py-1.5">${renderInline(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+                    i = j; continue;
+                }
+
+                // Heading (### text)
+                const h = line.match(/^(#{1,4})\s+(.*)$/);
+                if (h) { html += `<div class="font-bold text-white ${h[1].length <= 2 ? 'text-sm mt-3' : 'text-xs mt-2'} mb-1">${renderInline(h[2])}</div>`; i++; continue; }
+
+                // Bullet list
+                if (/^\s*[-*]\s+/.test(line)) {
+                    let j = i, items = [];
+                    while (j < lines.length && /^\s*[-*]\s+/.test(lines[j])) { items.push(lines[j].replace(/^\s*[-*]\s+/, '')); j++; }
+                    html += `<ul class="list-disc list-outside ml-4 space-y-1 my-2">${items.map(it => `<li>${renderInline(it)}</li>`).join('')}</ul>`;
+                    i = j; continue;
+                }
+
+                // Numbered list
+                if (/^\s*\d+[.)]\s+/.test(line)) {
+                    let j = i, items = [];
+                    while (j < lines.length && /^\s*\d+[.)]\s+/.test(lines[j])) { items.push(lines[j].replace(/^\s*\d+[.)]\s+/, '')); j++; }
+                    html += `<ol class="list-decimal list-outside ml-4 space-y-1 my-2">${items.map(it => `<li>${renderInline(it)}</li>`).join('')}</ol>`;
+                    i = j; continue;
+                }
+
+                if (line.trim() === '') { i++; continue; }
+                let j = i, para = [];
+                while (j < lines.length && lines[j].trim() !== '' && !/^\s*[-*]\s+/.test(lines[j]) && !/^\s*\d+[.)]\s+/.test(lines[j]) && !/^#{1,4}\s+/.test(lines[j]) && !isTableRow(lines[j])) { para.push(lines[j]); j++; }
+                html += `<div class="leading-relaxed">${renderInline(para.join('\n'))}</div>`;
+                i = j;
+            }
+            return html;
         }
 
         function copyCodeBlock(btn, id) {
@@ -812,19 +903,21 @@
         }
 
         // Authentication Handler
-                async function handleLogin() {
+        async function handleLogin() {
             const val = document.getElementById('login-key-input').value.trim();
             const err = document.getElementById('login-error');
             err.classList.add('hidden');
             if (!val) return;
             if (val.startsWith('ADAM-TEAM-')) {
                 const rec = await fbGet('teamKeys/' + encodeURIComponent(val));
-                if (rec && rec.active === true) {
+                if (rec && rec.active === true && (!rec.expires || rec.expires >= Date.now())) {
                     appState.role = 'team'; appState.currentKey = val; appState.currentName = rec.name;
+                    appState.readOnly = rec.role === 'Read-Only Observer';
                     appState.geminiKey = rec.gemini || ''; appState.groqKey = rec.groq || '';
-                    appState.teamKeys = [{ key: val, name: rec.name, requests: rec.requests || 0, active: true }];
+                    appState.teamKeys = [{ key: val, name: rec.name, role: rec.role, requests: rec.requests || 0, tokens: rec.tokens || 0, active: true }];
                     return startApp();
                 }
+                if (rec && rec.expires && rec.expires < Date.now()) { err.innerText = 'This team key has expired. Ask the owner for a new one.'; err.classList.remove('hidden'); return; }
             } else {
                 const tok = await fbSignIn(CLOUD.ownerEmail, val);
                 if (tok) {
@@ -835,11 +928,12 @@
                     return startApp();
                 }
             }
+            err.innerText = 'Invalid Owner Password or Unrecognized Team Key.';
             err.classList.remove('hidden');
         }
 
         function handleLogout() {
-            ownerToken = null; ownerPass = ''; appState.geminiKey = ''; appState.groqKey = '';
+            ownerToken = null; ownerPass = ''; appState.geminiKey = ''; appState.groqKey = ''; appState.readOnly = false;
             appState.role = null;
             appState.currentKey = '';
             appState.currentName = '';
@@ -855,25 +949,49 @@
             document.getElementById('app-wrapper').classList.add('flex');
             
             // Update UI roles
-            document.getElementById('header-role-label').innerText = appState.role === 'owner' ? 'Role: Master Owner' : `Role: ${appState.currentName}`;
+            document.getElementById('header-role-label').innerText = appState.role === 'owner' ? 'Role: Master Owner' : `Role: ${appState.currentName}${appState.readOnly ? ' (Read-Only)' : ''}`;
             document.getElementById('meta-role-display').innerText = appState.role === 'owner' ? 'Master Owner' : appState.currentName;
             
-            // Hide or show owner tab
+            // Hide or show owner tab / read-only lockdown
             const ownerNav = document.getElementById('nav-btn-owner');
+            const addRunbookBtn = document.getElementById('add-runbook-btn');
             if (appState.role === 'owner') {
                 ownerNav.style.display = 'flex';
                 document.getElementById('owner-gemini-key').value = appState.geminiKey;
                 document.getElementById('owner-groq-key').value = appState.groqKey;
                 renderTeamKeysTable();
+                checkOnboarding();
+                if (addRunbookBtn) addRunbookBtn.classList.remove('hidden');
             } else {
                 ownerNav.style.display = 'none';
+                if (addRunbookBtn) addRunbookBtn.classList.add('hidden');
             }
+            const mobileOwnerBtn = document.getElementById('mobile-nav-btn-owner');
+            if (mobileOwnerBtn) mobileOwnerBtn.style.display = appState.role === 'owner' ? 'flex' : 'none';
+            if (appState.readOnly) applyReadOnlyLockdown();
 
+            loadCustomRunbooks();
             updateDbHeader();
             renderRcaArchive();
             document.getElementById('current-ru-input').value = appState.currentRu;
             renderPatchTracker();
+            renderPersistedChats();
+            loadSharedRca();
             switchTab('query');
+        }
+
+        // Read-only role: hide anything that sends AI requests or mutates shared state.
+        function applyReadOnlyLockdown() {
+            ['generate-sql-btn', 'analyze-output-btn', 'ask-send-btn', 'chat-send-btn', 'run-safety-btn'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) { el.disabled = true; el.classList.add('opacity-40', 'cursor-not-allowed'); el.title = 'Read-only access: ask the owner for a full key.'; }
+            });
+        }
+
+        function checkOnboarding() {
+            const banner = document.getElementById('onboarding-banner');
+            if (!banner) return;
+            banner.classList.toggle('hidden', !!(appState.geminiKey || appState.groqKey));
         }
 
         // Navigation Switcher
@@ -890,6 +1008,38 @@
             const targetBtn = document.getElementById('nav-btn-' + tabId);
             if (targetTab) targetTab.classList.remove('hidden');
             if (targetBtn) targetBtn.classList.add('bg-slate-800', 'text-white');
+            closeMobileNav();
+        }
+
+        // Mobile hamburger nav
+        function toggleMobileNav() {
+            document.getElementById('mobile-nav-drawer').classList.toggle('hidden');
+        }
+        function closeMobileNav() {
+            const d = document.getElementById('mobile-nav-drawer');
+            if (d) d.classList.add('hidden');
+        }
+
+        // Light / dark theme toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            const isDark = html.classList.contains('dark');
+            html.classList.toggle('dark', !isDark);
+            html.classList.toggle('light', isDark);
+            html.style.background = isDark ? '#f8fafc' : '#020617';
+            localStorage.setItem('adam_theme', isDark ? 'light' : 'dark');
+            const icon = document.getElementById('theme-toggle-icon');
+            if (icon) icon.className = isDark ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
+        }
+        function initTheme() {
+            const saved = localStorage.getItem('adam_theme');
+            if (saved === 'light') {
+                document.documentElement.classList.remove('dark');
+                document.documentElement.classList.add('light');
+                document.documentElement.style.background = '#f8fafc';
+                const icon = document.getElementById('theme-toggle-icon');
+                if (icon) icon.className = 'fa-solid fa-sun';
+            }
         }
 
         // Database Modal
@@ -1025,7 +1175,8 @@
                     if (res.ok) {
                         const data = await res.json();
                         const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-                        if (text) return { text, provider: 'Gemini (1.5 Flash)' };
+                        const tokens = data.usageMetadata?.totalTokenCount || 0;
+                        if (text) { trackTokens(tokens); return { text, provider: 'Gemini (flash-latest)' }; }
                     } else {
                         geminiFailed = true;
                     }
@@ -1056,7 +1207,8 @@
                     if (res.ok) {
                         const data = await res.json();
                         const text = data.choices?.[0]?.message?.content;
-                        if (text) return { text, provider: 'Groq (GPT OSS 120B)' };
+                        const tokens = data.usage?.total_tokens || 0;
+                        if (text) { trackTokens(tokens); return { text, provider: 'Groq (GPT OSS 120B)' }; }
                     } else {
                         groqFailed = true;
                     }
@@ -1093,11 +1245,22 @@
             const q = document.getElementById('natural-query-input').value.trim();
             const ver = document.getElementById('query-version-select').value;
             if (!q) return;
-
-            document.getElementById('generated-sql-output').innerText = 'A.D.A.M is generating enterprise Oracle SQL...';
+            const btn = document.getElementById('generate-sql-btn');
+            setBusy(btn, true);
+            document.getElementById('generated-sql-output').innerHTML = renderTypingIndicator();
             
             const result = await callAiEngine(q, `You are an expert Oracle DBA. Write clean, production-safe Oracle SQL for version ${ver}. Return the SQL inside a fenced \`\`\`sql code block, with a short plain-text explanation if useful.`);
-            document.getElementById('generated-sql-output').innerHTML = renderRichText(result.text);
+            document.getElementById('generated-sql-output').innerHTML = renderRichText(result.text) + providerTag(result.provider);
+            updateSqlSafetyBadge(result.text);
+            setBusy(btn, false);
+        }
+
+        function updateSqlSafetyBadge(text) {
+            const badge = document.getElementById('sql-safety-badge');
+            const risk = quickRiskScan(text);
+            if (risk.level === 'CRITICAL') { badge.className = 'bg-red-500/10 text-red-400 border border-red-500/20 text-[10px] font-semibold px-2 py-0.5 rounded-full'; badge.innerText = 'CRITICAL RISK'; }
+            else if (risk.level === 'MODERATE') { badge.className = 'bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[10px] font-semibold px-2 py-0.5 rounded-full'; badge.innerText = 'MODERATE RISK'; }
+            else { badge.className = 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-semibold px-2 py-0.5 rounded-full'; badge.innerText = 'SAFE (Read-Only)'; }
         }
 
         function quickQuery(queryText) {
@@ -1116,19 +1279,55 @@
             const out = document.getElementById('query-output-paste').value.trim();
             const resBox = document.getElementById('query-analysis-result');
             if (!out) return;
+            const btn = document.getElementById('analyze-output-btn');
+            setBusy(btn, true);
 
             resBox.classList.remove('hidden');
-            resBox.innerText = 'Analyzing query output...';
+            resBox.innerHTML = renderTypingIndicator();
 
             const result = await callAiEngine(out, 'Analyze this Oracle SQL output as a senior DBA mentor, explain bottlenecks clearly, and suggest the exact next diagnostic step. Use fenced ```sql code blocks for any SQL you recommend.');
-            resBox.innerHTML = renderRichText(result.text);
+            resBox.innerHTML = renderRichText(result.text) + providerTag(result.provider);
+            setBusy(btn, false);
+        }
+
+        // ---------- Client-side instant SQL risk scan (no AI call, works offline) ----------
+        function quickRiskScan(sql) {
+            const s = String(sql || '').toUpperCase();
+            const reasons = [];
+            let level = 'SAFE';
+            if (/\bDROP\s+(TABLE|TABLESPACE|USER|DATABASE|INDEX)\b/.test(s)) { level = 'CRITICAL'; reasons.push('DROP statement detected'); }
+            if (/\bTRUNCATE\s+TABLE\b/.test(s)) { level = 'CRITICAL'; reasons.push('TRUNCATE TABLE detected'); }
+            if (/\bALTER\s+SYSTEM\b/.test(s)) { level = level === 'CRITICAL' ? level : 'MODERATE'; reasons.push('ALTER SYSTEM command'); }
+            if (/\bDELETE\s+FROM\s+\S+\s*(;|$)/.test(s) && !/\bWHERE\b/.test(s)) { level = 'CRITICAL'; reasons.push('DELETE with no WHERE clause'); }
+            if (/\bUPDATE\s+\S+\s+SET\b/.test(s) && !/\bWHERE\b/.test(s)) { level = 'CRITICAL'; reasons.push('UPDATE with no WHERE clause'); }
+            if (/\bGRANT\s+DBA\b/.test(s)) { level = level === 'CRITICAL' ? level : 'MODERATE'; reasons.push('Granting DBA privilege'); }
+            if (level === 'SAFE' && /\b(INSERT|UPDATE|DELETE|MERGE)\b/.test(s)) { level = 'MODERATE'; reasons.push('Write operation, review before running'); }
+            return { level, reasons };
+        }
+
+        function instantSafetyPrecheck() {
+            const sql = document.getElementById('safety-sql-input').value.trim();
+            const box = document.getElementById('safety-precheck');
+            if (!sql) { box.classList.add('hidden'); return; }
+            const { level, reasons } = quickRiskScan(sql);
+            box.classList.remove('hidden');
+            const styles = {
+                SAFE: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+                MODERATE: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+                CRITICAL: 'bg-red-500/10 text-red-400 border-red-500/20'
+            };
+            box.className = 'text-xs font-semibold px-3 py-2 rounded-xl border ' + styles[level];
+            box.innerHTML = `<i class="fa-solid fa-bolt"></i> Instant scan: <strong>${level}</strong>${reasons.length ? ' — ' + escapeHtml(reasons.join(', ')) : ' — no obvious destructive pattern found'}. Full AI inspection below gives a deeper review.`;
         }
 
         // ---------- Ask A.D.A.M (General Q&A) ----------
         async function sendAskMessage() {
+            if (appState.readOnly) return;
             const input = document.getElementById('ask-input');
             const msg = input.value.trim();
             if (!msg) return;
+            const btn = document.getElementById('ask-send-btn');
+            setBusy(btn, true);
 
             const container = document.getElementById('ask-messages');
             container.innerHTML += `
@@ -1137,20 +1336,25 @@
                 </div>`;
 
             appState.askChatHistory.push({ role: 'user', content: msg });
+            persistChats();
             input.value = '';
             container.scrollTop = container.scrollHeight;
+            const typingId = appendTypingBubble(container);
 
             const generalMentorPrompt = "You are A.D.A.M, an expert Oracle DBA with deep knowledge of Oracle 19c (currently patched to Release Update 19.32, with 19.33 scheduled for October 20, 2026) and 23ai architecture. Answer general questions clearly and conversationally: explain concepts, features, best practices, and version differences. This is a general knowledge Q&A channel, not an incident troubleshooting session, so keep answers informative and self-contained rather than asking the user to paste diagnostic output. Use fenced ```sql code blocks when sharing example SQL.";
 
             const response = await callAiEngine(withHistory(appState.askChatHistory, msg), generalMentorPrompt);
             appState.askChatHistory.push({ role: 'assistant', content: response.text });
+            persistChats();
+            removeTypingBubble(typingId);
 
             container.innerHTML += `
                 <div class="flex gap-3">
                     <div class="w-8 h-8 rounded-xl bg-red-600/10 border border-red-500/20 flex items-center justify-center text-red-500 shrink-0"><i class="fa-solid fa-robot"></i></div>
-                    <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 text-slate-200 max-w-3xl">${renderRichText(response.text)}</div>
+                    <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 text-slate-200 max-w-3xl">${renderRichText(response.text)}${providerTag(response.provider)}</div>
                 </div>`;
             container.scrollTop = container.scrollHeight;
+            setBusy(btn, false);
         }
 
         function clearAskChat() {
@@ -1162,13 +1366,17 @@
                     </div>
                 </div>`;
             appState.askChatHistory = [];
+            persistChats();
         }
 
         // ---------- Guided Investigation Chat Functions (Senior Human DBA Persona) ----------
         async function sendChatMessage() {
+            if (appState.readOnly) return;
             const input = document.getElementById('chat-input');
             let msg = input.value.trim();
             if (!msg && !appState.attachedFileContent) return;
+            const btn = document.getElementById('chat-send-btn');
+            setBusy(btn, true);
 
             if (appState.attachedFileContent) {
                 msg += `\n\n[Attached File (${appState.attachedFileName})]:\n` + appState.attachedFileContent;
@@ -1181,22 +1389,27 @@
                 </div>`;
             
             appState.chatHistory.push({ role: 'user', content: msg });
+            persistChats();
             input.value = '';
             removeAttachment();
             container.scrollTop = container.scrollHeight;
+            const typingId = appendTypingBubble(container);
 
             const seniorMentorPrompt = "You are A.D.A.M, an expert, senior Oracle DBA mentor with decades of production enterprise experience (Oracle 19.32-patched 19c & 23ai RAC). Interact like an experienced, supportive senior human colleague. Never give generic, robotic canned responses or bulleted lists of random suggestions. Instead, guide the user step-by-step through their troubleshooting session: talk conversationally, ask probing questions about what they see in their environment, request specific query outputs (like v$session, v$process, ASH, or alert logs) when needed, analyze what they provide, explain the underlying Oracle mechanics calmly, and collaborate closely until you find the exact root cause and resolution. Use fenced ```sql code blocks for any SQL you ask the user to run.";
             
             const response = await callAiEngine(withHistory(appState.chatHistory, msg), seniorMentorPrompt);
             
             appState.chatHistory.push({ role: 'assistant', content: response.text });
+            persistChats();
+            removeTypingBubble(typingId);
 
             container.innerHTML += `
                 <div class="flex gap-3">
                     <div class="w-8 h-8 rounded-xl bg-red-600/10 border border-red-500/20 flex items-center justify-center text-red-500 shrink-0"><i class="fa-solid fa-robot"></i></div>
-                    <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 text-slate-200 max-w-3xl">${renderRichText(response.text)}</div>
+                    <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 text-slate-200 max-w-3xl">${renderRichText(response.text)}${providerTag(response.provider)}</div>
                 </div>`;
             container.scrollTop = container.scrollHeight;
+            setBusy(btn, false);
         }
 
         function clearChat() {
@@ -1208,6 +1421,49 @@
                     </div>
                 </div>`;
             appState.chatHistory = [];
+            persistChats();
+        }
+
+        // ---------- Chat persistence (survives page refresh) ----------
+        function persistChats() {
+            localStorage.setItem('adam_chat_history', JSON.stringify(appState.chatHistory));
+            localStorage.setItem('adam_ask_chat_history', JSON.stringify(appState.askChatHistory));
+        }
+
+        function renderPersistedChats() {
+            const askContainer = document.getElementById('ask-messages');
+            const chatContainer = document.getElementById('chat-messages');
+            const bubble = (m) => m.role === 'user'
+                ? `<div class="flex gap-3 justify-end"><div class="bg-red-600/20 border border-red-500/30 rounded-2xl p-4 text-white max-w-2xl">${renderInline(m.content)}</div></div>`
+                : `<div class="flex gap-3"><div class="w-8 h-8 rounded-xl bg-red-600/10 border border-red-500/20 flex items-center justify-center text-red-500 shrink-0"><i class="fa-solid fa-robot"></i></div><div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 text-slate-200 max-w-3xl">${renderRichText(m.content)}</div></div>`;
+            if (appState.askChatHistory.length) askContainer.innerHTML += appState.askChatHistory.map(bubble).join('');
+            if (appState.chatHistory.length) chatContainer.innerHTML += appState.chatHistory.map(bubble).join('');
+        }
+
+        // ---------- UI helpers: busy state, typing indicator, provider tag ----------
+        function setBusy(btn, busy) {
+            if (!btn) return;
+            btn.disabled = busy;
+            btn.classList.toggle('opacity-60', busy);
+            btn.classList.toggle('cursor-not-allowed', busy);
+        }
+        function renderTypingIndicator() {
+            return `<div class="flex items-center gap-1.5 text-slate-500"><span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-bounce" style="animation-delay:0ms"></span><span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-bounce" style="animation-delay:150ms"></span><span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-bounce" style="animation-delay:300ms"></span><span class="ml-1">A.D.A.M is thinking...</span></div>`;
+        }
+        function appendTypingBubble(container) {
+            const id = 'typing-' + Math.random().toString(36).slice(2, 8);
+            container.innerHTML += `<div id="${id}" class="flex gap-3"><div class="w-8 h-8 rounded-xl bg-red-600/10 border border-red-500/20 flex items-center justify-center text-red-500 shrink-0"><i class="fa-solid fa-robot"></i></div><div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 max-w-3xl">${renderTypingIndicator()}</div></div>`;
+            container.scrollTop = container.scrollHeight;
+            return id;
+        }
+        function removeTypingBubble(id) {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+        }
+        function providerTag(provider) {
+            if (!provider) return '';
+            const isOffline = provider.includes('Offline');
+            return `<div class="mt-2 text-[10px] ${isOffline ? 'text-amber-500' : 'text-slate-600'} italic">via ${escapeHtml(provider)}</div>`;
         }
 
         async function concludeInvestigation() {
@@ -1231,33 +1487,52 @@
 
             appState.rcaArchive.unshift(rcaDoc);
             saveState();
+            await fbOwner('PUT', 'rcaArchive/' + ticketId, rcaDoc).catch(() => {});
+            // Team members can't write via fbOwner (needs owner auth) — fall back to a public-writable path.
+            if (appState.role !== 'owner') {
+                fetch(`${dbBase()}/rcaArchive/${ticketId}.json`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(rcaDoc) }).catch(() => {});
+            }
             renderRcaArchive();
-            alert(`Issue marked as resolved! Formal RCA document ${ticketId} has been successfully generated and archived.`);
+            alert(`Issue marked as resolved! Formal RCA document ${ticketId} has been successfully generated and archived for the whole team.`);
             switchTab('rca');
         }
 
-        // RCA Archive Functions
+        // RCA Archive Functions (shared across the team via Firebase, with local fallback)
+        async function loadSharedRca() {
+            const cloud = await fbGet('rcaArchive');
+            if (cloud) {
+                const cloudDocs = Object.values(cloud).sort((a, b) => (b.id > a.id ? 1 : -1));
+                const localOnly = appState.rcaArchive.filter(l => !cloudDocs.find(c => c.id === l.id));
+                appState.rcaArchive = [...localOnly, ...cloudDocs];
+            }
+            renderRcaArchive();
+        }
+
         function renderRcaArchive() {
             const list = document.getElementById('rca-archive-list');
+            const searchEl = document.getElementById('rca-search-input');
+            const q = (searchEl ? searchEl.value : '').trim().toLowerCase();
+            const items = appState.rcaArchive.filter(item => !q || item.title.toLowerCase().includes(q) || item.author.toLowerCase().includes(q) || item.text.toLowerCase().includes(q));
             document.getElementById('rca-count').innerText = appState.rcaArchive.length;
-            if (appState.rcaArchive.length === 0) {
-                list.innerHTML = `<div class="text-slate-500 italic">No archived RCAs yet. Conclude a guided investigation to generate one.</div>`;
+            if (items.length === 0) {
+                list.innerHTML = `<div class="text-slate-500 italic">${appState.rcaArchive.length ? 'No RCAs match your search.' : 'No archived RCAs yet. Conclude a guided investigation to generate one.'}</div>`;
                 return;
             }
-            list.innerHTML = appState.rcaArchive.map((item, idx) => `
-                <div onclick="loadRcaArchive(${idx})" class="bg-slate-950 border border-slate-800 hover:border-red-500/50 p-3 rounded-xl cursor-pointer transition-all space-y-1">
+            list.innerHTML = items.map((item) => `
+                <div onclick="loadRcaArchive('${item.id}')" class="bg-slate-950 border border-slate-800 hover:border-red-500/50 p-3 rounded-xl cursor-pointer transition-all space-y-1">
                     <div class="flex items-center justify-between">
                         <span class="font-bold text-white">${item.id}</span>
-                        <span class="text-[10px] text-red-400 font-mono">${item.author}</span>
+                        <span class="text-[10px] text-red-400 font-mono">${escapeHtml(item.author)}</span>
                     </div>
-                    <div class="text-[11px] text-slate-300 truncate">${item.title}</div>
+                    <div class="text-[11px] text-slate-300 truncate">${escapeHtml(item.title)}</div>
                     <div class="text-[10px] text-slate-500">${item.date}</div>
                 </div>
             `).join('');
         }
 
-        function loadRcaArchive(idx) {
-            const item = appState.rcaArchive[idx];
+        function loadRcaArchive(id) {
+            const item = appState.rcaArchive.find(r => r.id === id);
+            if (!item) return;
             document.getElementById('rca-viewer-title').innerText = `${item.id} — ${item.title}`;
             document.getElementById('rca-viewer-meta').innerText = `Created by: ${item.author} on ${item.date}`;
             document.getElementById('rca-output-preview').innerHTML = renderRichText(item.text);
@@ -1280,7 +1555,28 @@
             URL.revokeObjectURL(url);
         }
 
-        // ---------- Multi-Phase DBA Runbooks ----------
+        // Formatted, printable export (use the browser's "Save as PDF" print destination)
+        function printRca() {
+            const title = document.getElementById('rca-viewer-title').innerText;
+            const meta = document.getElementById('rca-viewer-meta').innerText;
+            const body = document.getElementById('rca-output-preview').innerHTML;
+            const w = window.open('', '_blank');
+            w.document.write(`<!DOCTYPE html><html><head><title>${escapeHtml(title)}</title>
+                <style>
+                    body{font-family:Georgia,serif;color:#1a1a1a;max-width:800px;margin:40px auto;padding:0 20px;line-height:1.6}
+                    h1{font-size:20px;border-bottom:2px solid #b91c1c;padding-bottom:10px}
+                    .meta{color:#666;font-size:12px;margin-bottom:24px}
+                    pre{background:#f4f4f4;border:1px solid #ddd;border-radius:6px;padding:12px;overflow-x:auto;font-family:monospace;font-size:12px}
+                    table{border-collapse:collapse;width:100%} td,th{border:1px solid #ccc;padding:6px;text-align:left}
+                    button{display:none}
+                </style></head><body>
+                <h1>${escapeHtml(title)}</h1><div class="meta">${escapeHtml(meta)}</div>${body}
+                <script>window.onload=()=>window.print()<\/script>
+                </body></html>`);
+            w.document.close();
+        }
+
+        // ---------- Multi-Phase DBA Runbooks (built-in + owner-authored, synced via Firebase) ----------
         const runbooksData = {
             blocking: {
                 title: "Blocking Session Investigation & Resolution",
@@ -1320,8 +1616,30 @@
             }
         };
 
+        async function loadCustomRunbooks() {
+            const cloud = await fbGet('customRunbooks');
+            appState.customRunbooks = cloud || {};
+            renderCustomRunbookCards();
+        }
+
+        function renderCustomRunbookCards() {
+            const wrap = document.getElementById('runbook-cards');
+            document.querySelectorAll('.custom-runbook-card').forEach(el => el.remove());
+            const colors = ['red', 'amber', 'emerald', 'blue', 'purple', 'pink'];
+            Object.entries(appState.customRunbooks).forEach(([key, rb], idx) => {
+                const c = colors[idx % colors.length];
+                const card = document.createElement('div');
+                card.className = 'custom-runbook-card bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4 shadow-xl';
+                card.innerHTML = `<div class="w-10 h-10 rounded-xl bg-${c}-600/10 text-${c}-500 border border-${c}-500/20 flex items-center justify-center"><i class="fa-solid fa-star"></i></div>
+                    <h3 class="text-sm font-bold text-white">${escapeHtml(rb.title)}</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed">Custom runbook added by the owner.</p>
+                    <button onclick="loadRunbookModal('${key}')" class="w-full bg-slate-800 hover:bg-slate-700 text-white text-xs py-2 rounded-xl border border-slate-700 transition-all">Open Runbook</button>`;
+                wrap.appendChild(card);
+            });
+        }
+
         function loadRunbookModal(type) {
-            const rb = runbooksData[type];
+            const rb = runbooksData[type] || appState.customRunbooks[type];
             if (!rb) return;
             switchTab('runbooks');
             document.getElementById('runbook-viewer').classList.remove('hidden');
@@ -1330,28 +1648,51 @@
                 <div class="border border-slate-800 rounded-xl overflow-hidden">
                     <div class="bg-slate-950 px-4 py-2 flex items-center gap-2 border-b border-slate-800">
                         <span class="w-5 h-5 rounded-full bg-red-600/20 text-red-400 text-[10px] font-bold flex items-center justify-center shrink-0">${idx + 1}</span>
-                        <span class="text-xs font-bold text-white uppercase tracking-wider">${p.name}</span>
+                        <span class="text-xs font-bold text-white uppercase tracking-wider">${escapeHtml(p.name)}</span>
                     </div>
                     <div class="p-4 text-xs text-slate-300">${renderRichText(p.content)}</div>
                 </div>
             `).join('');
         }
 
+        // Simple owner-only runbook editor (prompt-based, keeps this a single file)
+        async function openRunbookEditor() {
+            if (appState.role !== 'owner') return;
+            const title = prompt('Runbook title (e.g. "Listener Down Recovery"):');
+            if (!title) return;
+            const key = 'custom_' + title.toLowerCase().replace(/[^a-z0-9]+/g, '_').slice(0, 40) + '_' + Date.now().toString(36);
+            const phases = [];
+            for (const phaseName of ['Triage', 'Diagnostics', 'Remediation', 'Verification']) {
+                const content = prompt(`${phaseName} — describe this phase (use \`\`\`sql ... \`\`\` for code blocks):`, '');
+                phases.push({ name: phaseName, content: content || '(Not provided)' });
+            }
+            const rb = { title, phases };
+            const ok = await fbOwner('PUT', 'customRunbooks/' + key, rb);
+            if (ok === null) { alert('Could not save the runbook to the cloud. Check your Firebase connection.'); return; }
+            appState.customRunbooks[key] = rb;
+            renderCustomRunbookCards();
+            alert('Runbook added and synced to your team.');
+        }
+
         // Safety Checker
         async function runSafetyCheck() {
+            if (appState.readOnly) return;
             const sql = document.getElementById('safety-sql-input').value.trim();
             const res = document.getElementById('safety-result');
             if (!sql) return;
+            const btn = document.getElementById('run-safety-btn');
+            setBusy(btn, true);
 
             res.classList.remove('hidden');
-            res.innerText = 'Inspecting SQL for destructive statements...';
+            res.innerHTML = renderTypingIndicator();
 
             const result = await callAiEngine(sql, 'Inspect this SQL statement for missing WHERE clauses, destructive DML, and safety risks. Provide a risk rating (SAFE, MODERATE, CRITICAL) and a brief explanation.');
-            res.innerHTML = renderRichText(result.text);
+            res.innerHTML = renderRichText(result.text) + providerTag(result.provider);
+            setBusy(btn, false);
         }
 
         // Owner Controls, API Test & Team Keys
-                async function saveApiKeys() {
+        async function saveApiKeys() {
             appState.geminiKey = document.getElementById('owner-gemini-key').value.trim();
             appState.groqKey = document.getElementById('owner-groq-key').value.trim();
             localStorage.setItem('adam_gemini_key', appState.geminiKey);
@@ -1359,6 +1700,7 @@
             await fbOwner('PUT', 'ownerConfig', { gemini: appState.geminiKey, groq: appState.groqKey });
             for (const k of appState.teamKeys.filter(k => k.active))
                 await fbOwner('PATCH', 'teamKeys/' + k.key, { gemini: appState.geminiKey, groq: appState.groqKey });
+            checkOnboarding();
             alert('API keys saved and synced. Team members pick them up automatically.');
         }
 
@@ -1395,7 +1737,7 @@
             resBox.innerHTML = `Gemini: <span class="${geminiStatus.includes('SUCCESS')?'text-emerald-400':'text-red-400'}">${geminiStatus}</span><br>Groq: <span class="${groqStatus.includes('SUCCESS')?'text-emerald-400':'text-red-400'}">${groqStatus}</span>`;
         }
 
-                async function updateOwnerPassword() {
+        async function updateOwnerPassword() {
             const pass = document.getElementById('owner-new-password').value.trim();
             if (pass.length < 6) { alert('Use at least 6 characters.'); return; }
             try {
@@ -1427,20 +1769,23 @@
             alert('Team key list copied!\n\nPaste this over the EMBEDDED_TEAM_KEYS array near the top of the <script> in index.html, then commit & push to GitHub Pages.\n\nOnce deployed, everyone can open your single shared link and type in their own key from any device — no invite links needed.');
         }
 
-                async function generateTeamKey() {
+        async function generateTeamKey() {
             const name = prompt("Enter team member's full name:");
             if (!name) return;
+            const role = confirm('Click OK for a full access key, or Cancel for a Read-Only Observer key (can view but not run AI actions).') ? 'Senior DBA Team Member' : 'Read-Only Observer';
+            let expires = null;
+            const expDays = prompt('Optional: expire this key after how many days? Leave blank for no expiry.', '');
+            if (expDays && !isNaN(parseInt(expDays))) expires = Date.now() + parseInt(expDays) * 86400000;
             const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
             const newKey = 'ADAM-TEAM-' + Array.from(crypto.getRandomValues(new Uint8Array(8)), b => chars[b % 32]).join('');
-            const ok = await fbOwner('PUT', 'teamKeys/' + newKey, {
-                name, role: 'Senior DBA Team Member', requests: 0, active: true,
-                gemini: appState.geminiKey, groq: appState.groqKey
-            });
+            const record = { name, role, requests: 0, tokens: 0, active: true, gemini: appState.geminiKey, groq: appState.groqKey };
+            if (expires) record.expires = expires;
+            const ok = await fbOwner('PUT', 'teamKeys/' + newKey, record);
             if (ok === null) { alert('Could not save to the cloud. Check your Firebase rules and owner login.'); return; }
-            appState.teamKeys.push({ key: newKey, name, role: 'Senior DBA Team Member', requests: 0, active: true });
+            appState.teamKeys.push({ key: newKey, name, role, requests: 0, tokens: 0, active: true, expires });
             renderTeamKeysTable();
             navigator.clipboard.writeText(newKey);
-            alert(`Key for ${name}: ${newKey}\n\nCopied. It works immediately on any device. Share the site link and this key.`);
+            alert(`Key for ${name} (${role}): ${newKey}\n\nCopied. It works immediately on any device. Share the site link and this key.`);
         }
 
         // Team keys live only in this browser's localStorage (there is no backend),
@@ -1487,7 +1832,7 @@
             return true;
         }
 
-                async function revokeTeamKey(idx) {
+        async function revokeTeamKey(idx) {
             const k = appState.teamKeys[idx];
             if (await fbOwner('PATCH', 'teamKeys/' + k.key, { active: false }) === null) { alert('Cloud update failed.'); return; }
             k.active = false;
@@ -1497,15 +1842,17 @@
         function renderTeamKeysTable() {
             const tbody = document.getElementById('team-keys-table-body');
             if (appState.teamKeys.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-slate-500">No active team keys generated yet. Click generate above.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="py-4 text-center text-slate-500">No active team keys generated yet. Click generate above.</td></tr>`;
                 return;
             }
             tbody.innerHTML = appState.teamKeys.map((k, idx) => `
                 <tr class="border-b border-slate-800/60 ${!k.active ? 'opacity-40' : ''}">
                     <td class="py-3 px-3 font-bold text-white">${escapeHtml(k.name)}</td>
                     <td class="py-3 px-3 font-mono text-red-400">${k.key}</td>
+                    <td class="py-3 px-3">${escapeHtml(k.role || 'Senior DBA Team Member')}</td>
+                    <td class="py-3 px-3">${k.expires ? new Date(k.expires).toLocaleDateString() : '—'}</td>
                     <td class="py-3 px-3">${k.requests || 0}</td>
-                    <td class="py-3 px-3">${(k.requests || 0) * 450} tokens</td>
+                    <td class="py-3 px-3">${(k.tokens || 0).toLocaleString()}</td>
                     <td class="py-3 px-3 text-right">
                         ${k.active ? `
                         <div class="flex items-center justify-end gap-3">
@@ -1518,7 +1865,7 @@
             `).join('');
         }
 
-                function trackUsage() {
+        function trackUsage() {
             if (appState.role !== 'team') return;
             const f = appState.teamKeys.find(k => k.key === appState.currentKey);
             if (!f) return;
@@ -1526,19 +1873,39 @@
             fbBump(f.key, f.requests);
         }
 
+        function trackTokens(tokens) {
+            if (appState.role !== 'team' || !tokens) return;
+            const f = appState.teamKeys.find(k => k.key === appState.currentKey);
+            if (!f) return;
+            f.tokens = (f.tokens || 0) + tokens;
+            fetch(`${dbBase()}/teamKeys/${encodeURIComponent(f.key)}/tokens.json`, {
+                method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(f.tokens)
+            }).catch(() => {});
+        }
+
         function saveState() {
             localStorage.setItem('adam_team_keys', JSON.stringify(appState.teamKeys));
             localStorage.setItem('adam_rca_archive', JSON.stringify(appState.rcaArchive));
         }
 
+        // Keyboard shortcuts: Ctrl+Enter sends from any textarea, "/" focuses the main query input
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                const id = document.activeElement && document.activeElement.id;
+                if (id === 'chat-input' || id === 'safety-sql-input') { e.preventDefault(); if (id === 'chat-input') sendChatMessage(); else runSafetyCheck(); }
+                if (id === 'query-output-paste') { e.preventDefault(); analyzeQueryOutput(); }
+            }
+            if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+                const el = document.getElementById('natural-query-input');
+                if (el && !document.getElementById('auth-screen').classList.contains('hidden') === false) { e.preventDefault(); switchTab('query'); el.focus(); }
+            }
+        });
+
+        // Init theme before login screen renders
+        initTheme();
+
         // Auto-login if this page was opened via a team invite link.
-        (function () {
-            const k = new URLSearchParams(location.search).get('key');
-            if (!k) return;
-            document.getElementById('login-key-input').value = k;
-            history.replaceState({}, document.title, location.origin + location.pathname);
-            handleLogin();
-        })();
+        checkInviteLink();
     </script>
 </body>
 </html>
