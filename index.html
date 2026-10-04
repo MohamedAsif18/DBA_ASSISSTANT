@@ -26,6 +26,24 @@
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        /* LIGHT THEME OVERRIDES — the toggle only flips html.light/.dark; since the markup
+           uses literal Tailwind utility classes (not dark: variants), these overrides are
+           what actually make the light theme look different instead of just flagging a class. */
+        html.light body { background: #f8fafc; color: #1e293b; }
+        html.light .bg-slate-950 { background-color: #ffffff !important; }
+        html.light .bg-slate-900, html.light .bg-slate-900\/60, html.light .bg-slate-900\/80, html.light .bg-slate-950\/40, html.light .bg-slate-950\/80 { background-color: #f1f5f9 !important; }
+        html.light .bg-slate-800, html.light .bg-slate-800\/80, html.light .bg-slate-800\/50, html.light .bg-slate-800\/30, html.light .bg-slate-800\/60 { background-color: #e2e8f0 !important; }
+        html.light .hover\:bg-slate-700:hover, html.light .hover\:bg-slate-800:hover, html.light .hover\:bg-slate-800\/80:hover, html.light .hover\:bg-slate-850:hover { background-color: #cbd5e1 !important; }
+        html.light .border-slate-800, html.light .border-slate-800\/80, html.light .border-slate-800\/60, html.light .border-slate-700 { border-color: #cbd5e1 !important; }
+        html.light .text-white { color: #0f172a !important; }
+        html.light .text-slate-100, html.light .text-slate-200, html.light .text-slate-300 { color: #334155 !important; }
+        html.light .text-slate-400 { color: #64748b !important; }
+        html.light .text-slate-500, html.light .text-slate-600 { color: #94a3b8 !important; }
+        html.light input, html.light textarea, html.light select { color: #0f172a; }
+        html.light ::-webkit-scrollbar-track { background: #e2e8f0; }
+        html.light ::-webkit-scrollbar-thumb { background: #94a3b8; }
+        html.light .shadow-xl, html.light .shadow-2xl { box-shadow: 0 4px 14px rgba(0,0,0,0.08) !important; }
     </style>
 </head>
 <body id="app-body" class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-red-500 selection:text-white transition-colors duration-500">
@@ -329,10 +347,15 @@
                             </h2>
                             <p class="text-xs text-slate-400 mt-1">General Oracle architecture questions, feature lookups, and day-to-day DBA best practices. For structured incident troubleshooting, use Guided Investigation instead.</p>
                         </div>
-                        <button onclick="clearAskChat()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2.5 rounded-xl text-xs font-medium transition-all border border-slate-700">Reset</button>
+                        <button onclick="newConversation('ask')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2.5 rounded-xl text-xs font-medium transition-all border border-slate-700 flex items-center gap-1.5"><i class="fa-solid fa-plus"></i> New Chat</button>
                     </div>
 
-                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col h-[550px]">
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-xl flex h-[550px] overflow-hidden">
+                        <div class="w-48 border-r border-slate-800 bg-slate-950/40 p-3 flex flex-col shrink-0 hidden md:flex">
+                            <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 px-1">Previous Chats</div>
+                            <div id="ask-conv-list" class="flex-1 overflow-y-auto space-y-1"></div>
+                        </div>
+                        <div class="flex-1 flex flex-col p-6 min-w-0">
                         <div id="ask-messages" class="flex-1 overflow-y-auto space-y-4 pr-2 mb-4 font-mono text-xs">
                             <div class="flex gap-3">
                                 <div class="w-8 h-8 rounded-xl bg-red-600/10 border border-red-500/20 flex items-center justify-center text-red-500 shrink-0">
@@ -353,6 +376,7 @@
                                 <i class="fa-solid fa-paper-plane"></i> Send
                             </button>
                         </div>
+                        </div>
                     </div>
                 </div>
 
@@ -363,17 +387,22 @@
                             <h2 class="text-xl font-bold text-white flex items-center gap-2">
                                 <i class="fa-solid fa-brain text-red-500"></i> A.D.A.M Senior Mentor Guided Investigation
                             </h2>
-                            <p class="text-xs text-slate-400 mt-1">Chat live with your senior human DBA mentor. Paste query results, attach log files, and solve issues step-by-step until final resolution and RCA archiving.</p>
+                            <p class="text-xs text-slate-400 mt-1">Chat live with your senior human DBA mentor. Paste query results, attach log files or screenshots, and solve issues step-by-step until final resolution and RCA archiving.</p>
                         </div>
                         <div class="flex items-center gap-2">
                             <button onclick="concludeInvestigation()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2.5 rounded-xl text-xs font-semibold transition-all shadow-lg shadow-emerald-600/20 flex items-center gap-2">
                                 <i class="fa-solid fa-circle-check"></i> Mark as Resolved & Conclude RCA
                             </button>
-                            <button onclick="clearChat()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2.5 rounded-xl text-xs font-medium transition-all border border-slate-700">Reset</button>
+                            <button onclick="newConversation('chat')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2.5 rounded-xl text-xs font-medium transition-all border border-slate-700 flex items-center gap-1.5"><i class="fa-solid fa-plus"></i> New Chat</button>
                         </div>
                     </div>
 
-                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col h-[550px]">
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-xl flex h-[550px] overflow-hidden">
+                        <div class="w-48 border-r border-slate-800 bg-slate-950/40 p-3 flex flex-col shrink-0 hidden md:flex">
+                            <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 px-1">Previous Investigations</div>
+                            <div id="chat-conv-list" class="flex-1 overflow-y-auto space-y-1"></div>
+                        </div>
+                        <div class="flex-1 flex flex-col p-6 min-w-0">
                         <div id="chat-messages" class="flex-1 overflow-y-auto space-y-4 pr-2 mb-4 font-mono text-xs">
                             <div class="flex gap-3">
                                 <div class="w-8 h-8 rounded-xl bg-red-600/10 border border-red-500/20 flex items-center justify-center text-red-500 shrink-0">
@@ -381,28 +410,29 @@
                                 </div>
                                 <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 text-slate-200 max-w-3xl leading-relaxed">
                                     <strong>Hey there! I'm A.D.A.M, your senior DBA colleague.</strong><br>
-                                    What are we troubleshooting today? Drop your ORA- errors, sluggish SQL queries, or wait events below, and let's tackle it together step-by-step until we find the root cause.
+                                    What are we troubleshooting today? Drop your ORA- errors, sluggish SQL queries, or wait events below, paste a screenshot, and let's tackle it together step-by-step until we find the root cause.
                                 </div>
                             </div>
                         </div>
 
                         <!-- Attachment file preview banner -->
                         <div id="attachment-preview" class="hidden items-center justify-between bg-slate-950 border border-slate-800 px-3 py-2 rounded-xl text-xs mb-2 text-slate-300">
-                            <span id="attachment-name" class="font-mono text-red-400">Attached File</span>
+                            <span id="attachment-name" class="font-mono text-red-400 flex items-center">Attached File</span>
                             <button onclick="removeAttachment()" class="text-slate-500 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
                         </div>
 
                         <div class="flex items-center gap-2 pt-2 border-t border-slate-800">
-                            <input type="file" id="chat-file-input" class="hidden" onchange="handleFileAttachment(event)">
-                            <button onclick="document.getElementById('chat-file-input').click()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 p-3 rounded-xl transition-all border border-slate-700" title="Attach Log File">
+                            <input type="file" id="chat-file-input" class="hidden" accept="image/*,.txt,.log,.csv,.json" onchange="handleFileAttachment(event)">
+                            <button onclick="document.getElementById('chat-file-input').click()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 p-3 rounded-xl transition-all border border-slate-700" title="Attach log file or screenshot (or paste an image directly)">
                                 <i class="fa-solid fa-paperclip"></i>
                             </button>
-                            <input type="text" id="chat-input" placeholder="Talk to your senior DBA mentor or paste query output..." 
+                            <input type="text" id="chat-input" placeholder="Talk to your senior DBA mentor, paste query output, or paste a screenshot..." 
                                 onkeydown="if(event.key==='Enter') sendChatMessage()"
                                 class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-red-500 font-mono">
                             <button id="chat-send-btn" onclick="sendChatMessage()" class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white px-6 py-3 rounded-xl text-xs font-medium transition-all shadow-lg shadow-red-600/20 flex items-center gap-2">
                                 <i class="fa-solid fa-paper-plane"></i> Send
                             </button>
+                        </div>
                         </div>
                     </div>
                 </div>
@@ -452,9 +482,9 @@
                             <h2 class="text-xl font-bold text-white flex items-center gap-2">
                                 <i class="fa-solid fa-book-medical text-red-500"></i> Interactive DBA Runbooks
                             </h2>
-                            <p class="text-xs text-slate-400 mt-1">Multi-phase operational runbooks (Triage → Diagnostics → Remediation → Verification) for critical Oracle DBA tasks and emergency recovery.</p>
+                            <p class="text-xs text-slate-400 mt-1">Multi-phase operational runbooks (Triage → Diagnostics → Remediation → Verification) for critical Oracle DBA tasks and emergency recovery. Anyone on the team can publish one.</p>
                         </div>
-                        <button id="add-runbook-btn" onclick="openRunbookEditor()" class="hidden bg-amber-600 hover:bg-amber-500 text-white px-3 py-2 rounded-xl text-xs font-medium transition-all shrink-0 flex items-center gap-1.5"><i class="fa-solid fa-plus"></i> Add Runbook</button>
+                        <button id="add-runbook-btn" onclick="openRunbookModal()" class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-2 rounded-xl text-xs font-medium transition-all shrink-0 flex items-center gap-1.5"><i class="fa-solid fa-plus"></i> Add Runbook</button>
                     </div>
 
                     <div id="runbook-cards" class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -654,7 +684,7 @@
                             </div>
                             </div>
                             <div class="bg-slate-950 border border-slate-800/80 rounded-xl p-3 text-[11px] text-slate-400 leading-relaxed">
-                                <strong class="text-slate-300">Cloud keys:</strong> new keys are saved to your Firebase database and work instantly on any device. Share the site link plus the key. Revoke disables a key everywhere. Estimated tokens now reflect real API usage where the provider reports it.</div>
+                                <strong class="text-slate-300">Cloud keys:</strong> new keys are saved to your Firebase database and work instantly on any device. Share the site link plus the key. Revoke disables a key everywhere. Each key now allows only one active session at a time.</div>
                             <div class="overflow-x-auto">
                                 <table class="w-full text-left text-xs font-mono">
                                     <thead>
@@ -703,6 +733,57 @@
                 <div class="flex gap-2 pt-2">
                     <button onclick="saveTargetDb()" class="flex-1 bg-red-600 hover:bg-red-500 text-white py-2.5 rounded-xl font-medium transition-all">Save & Connect</button>
                     <button onclick="closeDbModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2.5 rounded-xl font-medium transition-all">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RUNBOOK EDITOR MODAL (upload/describe -> AI draft -> preview/edit -> publish) -->
+    <div id="runbook-editor-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-2xl p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between">
+                <h3 class="text-base font-bold text-white flex items-center gap-2"><i class="fa-solid fa-book-medical text-amber-500"></i> Add a Runbook</h3>
+                <button onclick="closeRunbookModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div id="runbook-draft-step" class="space-y-3 text-xs">
+                <p class="text-slate-400">Upload a document (.txt, .md, .pdf, .docx) describing the issue or procedure, or just describe it below. A.D.A.M will draft a 4-phase runbook you can review and edit before publishing.</p>
+                <div>
+                    <label class="block text-slate-400 mb-1 font-semibold">Upload a document (optional)</label>
+                    <input type="file" id="runbook-source-file" accept=".txt,.md,.pdf,.docx" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white text-xs">
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1 font-semibold">Or describe the issue / procedure directly</label>
+                    <textarea id="runbook-source-text" rows="5" placeholder="e.g. Steps we took last time the listener went down on PROD_ORCL..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-amber-500"></textarea>
+                </div>
+                <button id="runbook-draft-btn" onclick="draftRunbookNow()" class="bg-amber-600 hover:bg-amber-500 text-white font-medium px-4 py-2.5 rounded-xl text-xs transition-all flex items-center gap-2"><i class="fa-solid fa-wand-magic-sparkles"></i> Draft with A.D.A.M</button>
+            </div>
+
+            <div id="runbook-preview-step" class="space-y-3 text-xs hidden">
+                <p class="text-slate-400">Review and edit the draft below, then publish. It will be visible to the whole team with your name and today's date.</p>
+                <div>
+                    <label class="block text-slate-400 mb-1 font-semibold">Title</label>
+                    <input type="text" id="runbook-preview-title" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white text-xs">
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1 font-semibold">Triage</label>
+                    <textarea id="runbook-preview-triage" rows="3" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white font-mono"></textarea>
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1 font-semibold">Diagnostics</label>
+                    <textarea id="runbook-preview-diagnostics" rows="4" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white font-mono"></textarea>
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1 font-semibold">Remediation</label>
+                    <textarea id="runbook-preview-remediation" rows="4" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white font-mono"></textarea>
+                </div>
+                <div>
+                    <label class="block text-slate-400 mb-1 font-semibold">Verification</label>
+                    <textarea id="runbook-preview-verification" rows="3" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white font-mono"></textarea>
+                </div>
+                <div class="flex gap-2 pt-2">
+                    <button onclick="publishRunbook()" class="flex-1 bg-red-600 hover:bg-red-500 text-white py-2.5 rounded-xl font-medium transition-all">Publish to Team</button>
+                    <button onclick="document.getElementById('runbook-preview-step').classList.add('hidden'); document.getElementById('runbook-draft-step').classList.remove('hidden');" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2.5 rounded-xl font-medium transition-all">Back</button>
                 </div>
             </div>
         </div>
@@ -761,7 +842,7 @@
             if (cfg) { appState.geminiKey = cfg.gemini || appState.geminiKey; appState.groqKey = cfg.groq || appState.groqKey; }
             const keys = await fbOwner('GET', 'teamKeys');
             appState.teamKeys = keys ? Object.entries(keys).map(([k, v]) => ({
-                key: k, name: v.name, role: v.role || 'Senior DBA Team Member', requests: v.requests || 0, active: v.active === true
+                key: k, name: v.name, role: v.role || 'Senior DBA Team Member', requests: v.requests || 0, tokens: v.tokens || 0, expires: v.expires || null, active: v.active === true
             })) : [];
         }
         function withHistory(hist, msg) {
@@ -787,6 +868,8 @@
             currentKey: '',
             currentName: '',
             readOnly: false,
+            sessionId: null,
+            sessionHeartbeatTimer: null,
             ownerPassword: localStorage.getItem('adam_owner_pass') || '',
             geminiKey: localStorage.getItem('adam_gemini_key') || '',
             groqKey: localStorage.getItem('adam_groq_key') || '',
@@ -794,10 +877,15 @@
             teamKeys: mergeTeamKeys(),
             rcaArchive: JSON.parse(localStorage.getItem('adam_rca_archive') || '[]'),
             currentRu: localStorage.getItem('adam_current_ru') || '',
-            chatHistory: JSON.parse(localStorage.getItem('adam_chat_history') || '[]'),
-            askChatHistory: JSON.parse(localStorage.getItem('adam_ask_chat_history') || '[]'),
+            chatHistory: [],
+            askChatHistory: [],
+            chatConversations: [],
+            askConversations: [],
+            activeChatConvId: null,
+            activeAskConvId: null,
             attachedFileContent: null,
             attachedFileName: null,
+            attachedImageData: null,
             rateLimited: false,
             rateLimitCountdown: 0,
             rateLimitTimer: null,
@@ -832,8 +920,18 @@
                     const lang = (parts[i + 1] || 'sql').toUpperCase();
                     const code = (parts[i + 2] || '').replace(/^\n/, '').trim();
                     const blockId = 'code-' + Math.random().toString(36).slice(2, 10);
+                    const risk = quickRiskScan(code);
+                    let warningHtml = '';
+                    if (risk.level !== 'SAFE') {
+                        const styles = risk.level === 'CRITICAL' ? 'bg-red-500/15 text-red-300 border-red-500/40' : 'bg-amber-500/15 text-amber-300 border-amber-500/40';
+                        warningHtml = `<div class="flex items-start gap-2 text-[11px] font-semibold px-3 py-2 rounded-t-xl border ${styles} border-b-0">
+                            <i class="fa-solid fa-triangle-exclamation mt-0.5"></i>
+                            <span>${risk.level === 'CRITICAL' ? 'DESTRUCTIVE / CONFIG-CHANGING STATEMENT' : 'REVIEW BEFORE RUNNING'} — ${escapeHtml(risk.reasons.join(', ') || 'this writes data or changes configuration')}. Confirm this is intended and test outside production first.</span>
+                        </div>`;
+                    }
                     html += `
                         <div class="relative bg-slate-950 border border-slate-800 rounded-xl my-3 overflow-hidden">
+                            ${warningHtml}
                             <div class="flex items-center justify-between bg-slate-900/80 px-3 py-1.5 border-b border-slate-800">
                                 <span class="text-[10px] uppercase tracking-wider text-red-400 font-semibold">${escapeHtml(lang)}</span>
                                 <button onclick="copyCodeBlock(this, '${blockId}')" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-0.5 rounded-lg border border-slate-700 flex items-center gap-1 transition-all"><i class="fa-regular fa-copy"></i> Copy</button>
@@ -902,6 +1000,44 @@
             setTimeout(() => { btn.innerHTML = original; }, 1500);
         }
 
+        // ---------- Single-session enforcement for team keys (soft-kick, 2-way heartbeat) ----------
+        function generateSessionId() {
+            return 'sess_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 10);
+        }
+
+        async function startTeamSession(key) {
+            const localSessionStoreKey = 'adam_session_' + key;
+            let sid = localStorage.getItem(localSessionStoreKey);
+            if (!sid) { sid = generateSessionId(); localStorage.setItem(localSessionStoreKey, sid); }
+            appState.sessionId = sid;
+            // Claiming this slot deliberately overwrites whatever session is there —
+            // that's what soft-kicks a different browser/device using the same key.
+            await fetch(`${dbBase()}/teamKeys/${encodeURIComponent(key)}/session.json`, {
+                method: 'PUT', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sessionId: sid, lastActive: Date.now(), device: navigator.userAgent.slice(0, 60) })
+            }).catch(() => {});
+            if (appState.sessionHeartbeatTimer) clearInterval(appState.sessionHeartbeatTimer);
+            appState.sessionHeartbeatTimer = setInterval(() => checkSessionTakeover(key, sid), 20000);
+        }
+
+        async function checkSessionTakeover(key, sid) {
+            const remote = await fbGet('teamKeys/' + encodeURIComponent(key) + '/session').catch(() => null);
+            if (remote && remote.sessionId && remote.sessionId !== sid) {
+                clearInterval(appState.sessionHeartbeatTimer);
+                alert('You have been signed out because this team key was just used to log in on another device or browser. Only one active session per key is allowed.');
+                handleLogout();
+                return;
+            }
+            fetch(`${dbBase()}/teamKeys/${encodeURIComponent(key)}/session/lastActive.json`, {
+                method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Date.now())
+            }).catch(() => {});
+        }
+
+        function stopTeamSession() {
+            if (appState.sessionHeartbeatTimer) clearInterval(appState.sessionHeartbeatTimer);
+            appState.sessionHeartbeatTimer = null;
+        }
+
         // Authentication Handler
         async function handleLogin() {
             const val = document.getElementById('login-key-input').value.trim();
@@ -915,6 +1051,7 @@
                     appState.readOnly = rec.role === 'Read-Only Observer';
                     appState.geminiKey = rec.gemini || ''; appState.groqKey = rec.groq || '';
                     appState.teamKeys = [{ key: val, name: rec.name, role: rec.role, requests: rec.requests || 0, tokens: rec.tokens || 0, active: true }];
+                    await startTeamSession(val);
                     return startApp();
                 }
                 if (rec && rec.expires && rec.expires < Date.now()) { err.innerText = 'This team key has expired. Ask the owner for a new one.'; err.classList.remove('hidden'); return; }
@@ -933,6 +1070,7 @@
         }
 
         function handleLogout() {
+            stopTeamSession();
             ownerToken = null; ownerPass = ''; appState.geminiKey = ''; appState.groqKey = ''; appState.readOnly = false;
             appState.role = null;
             appState.currentKey = '';
@@ -954,17 +1092,14 @@
             
             // Hide or show owner tab / read-only lockdown
             const ownerNav = document.getElementById('nav-btn-owner');
-            const addRunbookBtn = document.getElementById('add-runbook-btn');
             if (appState.role === 'owner') {
                 ownerNav.style.display = 'flex';
                 document.getElementById('owner-gemini-key').value = appState.geminiKey;
                 document.getElementById('owner-groq-key').value = appState.groqKey;
                 renderTeamKeysTable();
                 checkOnboarding();
-                if (addRunbookBtn) addRunbookBtn.classList.remove('hidden');
             } else {
                 ownerNav.style.display = 'none';
-                if (addRunbookBtn) addRunbookBtn.classList.add('hidden');
             }
             const mobileOwnerBtn = document.getElementById('mobile-nav-btn-owner');
             if (mobileOwnerBtn) mobileOwnerBtn.style.display = appState.role === 'owner' ? 'flex' : 'none';
@@ -975,7 +1110,8 @@
             renderRcaArchive();
             document.getElementById('current-ru-input').value = appState.currentRu;
             renderPatchTracker();
-            renderPersistedChats();
+            loadConversations('chat');
+            loadConversations('ask');
             loadSharedRca();
             switchTab('query');
         }
@@ -1106,25 +1242,51 @@
             }
         }
 
-        // File Attachment Handler
+        // ---------- File / image attachment (Guided Investigation) ----------
         function handleFileAttachment(event) {
             const file = event.target.files[0];
             if (!file) return;
+            if (file.type.startsWith('image/')) { attachImageFile(file); return; }
             const reader = new FileReader();
             reader.onload = function(e) {
                 appState.attachedFileContent = e.target.result;
                 appState.attachedFileName = file.name;
-                const prev = document.getElementById('attachment-preview');
-                prev.classList.remove('hidden');
-                prev.classList.add('flex');
-                document.getElementById('attachment-name').innerText = `Attached: ${file.name}`;
+                appState.attachedImageData = null;
+                showAttachmentPreview(file.name, null);
             };
             reader.readAsText(file);
+        }
+
+        function attachImageFile(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const dataUrl = e.target.result;
+                const match = dataUrl.match(/^data:(.*?);base64,(.*)$/);
+                if (!match) return;
+                appState.attachedImageData = { mimeType: match[1], data: match[2], dataUrl };
+                appState.attachedFileName = file.name || 'pasted-image.png';
+                appState.attachedFileContent = null;
+                showAttachmentPreview(appState.attachedFileName, dataUrl);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function showAttachmentPreview(name, imgDataUrl) {
+            const prev = document.getElementById('attachment-preview');
+            prev.classList.remove('hidden');
+            prev.classList.add('flex');
+            const label = document.getElementById('attachment-name');
+            if (imgDataUrl) {
+                label.innerHTML = `<img src="${imgDataUrl}" class="h-8 w-8 object-cover rounded-md mr-2 border border-slate-700">${escapeHtml(name)}`;
+            } else {
+                label.innerText = `Attached: ${name}`;
+            }
         }
 
         function removeAttachment() {
             appState.attachedFileContent = null;
             appState.attachedFileName = null;
+            appState.attachedImageData = null;
             const prev = document.getElementById('attachment-preview');
             prev.classList.add('hidden');
             prev.classList.remove('flex');
@@ -1156,7 +1318,7 @@
         }
 
         // AI Multi-API Router with Automatic Failover & Senior DBA Mentor Prompt
-        async function callAiEngine(prompt, systemInstruction = "") {
+        async function callAiEngine(prompt, systemInstruction = "", image = null) {
             trackUsage();
             let geminiFailed = false;
             let groqFailed = false;
@@ -1165,12 +1327,12 @@
             // points at Google's current GA Flash model, so this keeps working across retirements)
             if (appState.geminiKey) {
                 try {
+                    const parts = [{ text: (systemInstruction ? systemInstruction + "\n\n" : "") + prompt }];
+                    if (image) parts.push({ inline_data: { mime_type: image.mimeType, data: image.data } });
                     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${appState.geminiKey}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            contents: [{ parts: [{ text: (systemInstruction ? systemInstruction + "\n\n" : "") + prompt }] }]
-                        })
+                        body: JSON.stringify({ contents: [{ parts }] })
                     });
                     if (res.ok) {
                         const data = await res.json();
@@ -1187,9 +1349,13 @@
                 geminiFailed = true;
             }
 
-            // Fallback to Groq if configured (using openai/gpt-oss-120b)
+            // Fallback to Groq if configured (using openai/gpt-oss-120b). Groq's text model
+            // can't see images, so we swap in a short note instead of silently ignoring it.
             if (appState.groqKey) {
                 try {
+                    const groqPrompt = image
+                        ? prompt + '\n\n[Note: an image was attached to this message, but this provider cannot see images. Ask the user to describe what the image shows, or ask them to configure a Gemini key for image support.]'
+                        : prompt;
                     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                         method: 'POST',
                         headers: {
@@ -1200,7 +1366,7 @@
                             model: 'openai/gpt-oss-120b',
                             messages: [
                                 { role: 'system', content: systemInstruction || 'You are A.D.A.M, an expert Oracle Database Administrator assistant.' },
-                                { role: 'user', content: prompt }
+                                { role: 'user', content: groqPrompt }
                             ]
                         })
                     });
@@ -1320,6 +1486,90 @@
             box.innerHTML = `<i class="fa-solid fa-bolt"></i> Instant scan: <strong>${level}</strong>${reasons.length ? ' — ' + escapeHtml(reasons.join(', ')) : ' — no obvious destructive pattern found'}. Full AI inspection below gives a deeper review.`;
         }
 
+        // ---------- Multi-conversation chat history (Ask + Guided Investigation) ----------
+        function convPath(kind) {
+            if (appState.role === 'owner') return `ownerConversations/${kind}`;
+            return `teamKeys/${encodeURIComponent(appState.currentKey)}/conversations/${kind}`;
+        }
+
+        async function loadConversations(kind) {
+            const data = await fbGet(convPath(kind)).catch(() => null);
+            const list = data ? Object.entries(data).map(([id, v]) => ({ id, ...v })).sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0)) : [];
+            if (kind === 'chat') appState.chatConversations = list; else appState.askConversations = list;
+            renderConversationList(kind);
+        }
+
+        function renderConversationList(kind) {
+            const wrap = document.getElementById(kind + '-conv-list');
+            if (!wrap) return;
+            const list = kind === 'chat' ? appState.chatConversations : appState.askConversations;
+            const activeId = kind === 'chat' ? appState.activeChatConvId : appState.activeAskConvId;
+            wrap.innerHTML = list.map(c => `
+                <div onclick="switchConversation('${kind}','${c.id}')" class="group flex items-center justify-between gap-1 px-2.5 py-2 rounded-lg cursor-pointer text-[11px] ${c.id === activeId ? 'bg-red-600/20 text-white' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'}">
+                    <span class="truncate">${escapeHtml(c.title || 'New conversation')}</span>
+                    <button onclick="event.stopPropagation(); deleteConversation('${kind}','${c.id}')" class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-red-400 shrink-0"><i class="fa-solid fa-trash text-[10px]"></i></button>
+                </div>`).join('') || `<div class="text-slate-600 italic px-2.5 py-2">No previous chats yet.</div>`;
+        }
+
+        function bubbleHtml(m) {
+            if (m.role === 'user') {
+                const img = m.image ? `<img src="${m.image}" class="max-h-40 rounded-lg border border-red-400/30 mb-2">` : '';
+                return `<div class="flex gap-3 justify-end"><div class="bg-red-600/20 border border-red-500/30 rounded-2xl p-4 text-white max-w-2xl">${img}${m.content ? renderInline(m.content) : ''}</div></div>`;
+            }
+            return `<div class="flex gap-3"><div class="w-8 h-8 rounded-xl bg-red-600/10 border border-red-500/20 flex items-center justify-center text-red-500 shrink-0"><i class="fa-solid fa-robot"></i></div><div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 text-slate-200 max-w-3xl">${renderRichText(m.content)}</div></div>`;
+        }
+
+        const ASK_GREETING = `<div class="flex gap-3"><div class="w-8 h-8 rounded-xl bg-red-600/10 border border-red-500/20 flex items-center justify-center text-red-500 shrink-0"><i class="fa-solid fa-robot"></i></div><div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 text-slate-200 max-w-3xl leading-relaxed"><strong>Hi, I'm A.D.A.M.</strong><br>Ask me anything about Oracle architecture, features, patching, or general DBA best practices — no active incident required.</div></div>`;
+        const CHAT_GREETING = `<div class="flex gap-3"><div class="w-8 h-8 rounded-xl bg-red-600/10 border border-red-500/20 flex items-center justify-center text-red-500 shrink-0"><i class="fa-solid fa-robot"></i></div><div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 text-slate-200 max-w-3xl leading-relaxed"><strong>Hey there! I'm A.D.A.M, your senior DBA colleague.</strong><br>What are we troubleshooting today? Drop your ORA- errors, sluggish SQL queries, or wait events below, paste a screenshot, and let's tackle it together step-by-step until we find the root cause.</div></div>`;
+
+        function newConversation(kind) {
+            if (kind === 'chat') { appState.chatHistory = []; appState.activeChatConvId = null; document.getElementById('chat-messages').innerHTML = CHAT_GREETING; }
+            else { appState.askChatHistory = []; appState.activeAskConvId = null; document.getElementById('ask-messages').innerHTML = ASK_GREETING; }
+            renderConversationList(kind);
+        }
+        function clearChat() { newConversation('chat'); }
+        function clearAskChat() { newConversation('ask'); }
+
+        function switchConversation(kind, id) {
+            const list = kind === 'chat' ? appState.chatConversations : appState.askConversations;
+            const conv = list.find(c => c.id === id);
+            if (!conv) return;
+            const messages = conv.messages || [];
+            if (kind === 'chat') { appState.chatHistory = messages; appState.activeChatConvId = id; document.getElementById('chat-messages').innerHTML = messages.length ? messages.map(bubbleHtml).join('') : CHAT_GREETING; }
+            else { appState.askChatHistory = messages; appState.activeAskConvId = id; document.getElementById('ask-messages').innerHTML = messages.length ? messages.map(bubbleHtml).join('') : ASK_GREETING; }
+            renderConversationList(kind);
+        }
+
+        async function deleteConversation(kind, id) {
+            if (!confirm('Delete this conversation? This cannot be undone.')) return;
+            const path = convPath(kind) + '/' + id;
+            if (appState.role === 'owner') await fbOwner('DELETE', path);
+            else await fetch(`${dbBase()}/${path}.json`, { method: 'DELETE' }).catch(() => {});
+            if (kind === 'chat') { appState.chatConversations = appState.chatConversations.filter(c => c.id !== id); if (appState.activeChatConvId === id) newConversation('chat'); }
+            else { appState.askConversations = appState.askConversations.filter(c => c.id !== id); if (appState.activeAskConvId === id) newConversation('ask'); }
+            renderConversationList(kind);
+        }
+
+        async function saveConversation(kind) {
+            const history = kind === 'chat' ? appState.chatHistory : appState.askChatHistory;
+            if (!history.length) return;
+            let id = kind === 'chat' ? appState.activeChatConvId : appState.activeAskConvId;
+            if (!id) {
+                id = 'conv_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+                if (kind === 'chat') appState.activeChatConvId = id; else appState.activeAskConvId = id;
+            }
+            const firstUserMsg = history.find(m => m.role === 'user');
+            const title = (firstUserMsg ? firstUserMsg.content : 'New conversation').replace(/\n/g, ' ').slice(0, 60) || 'New conversation';
+            const record = { title, messages: history, updatedAt: Date.now() };
+            const path = convPath(kind) + '/' + id;
+            if (appState.role === 'owner') await fbOwner('PUT', path, record).catch(() => {});
+            else await fetch(`${dbBase()}/${path}.json`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(record) }).catch(() => {});
+            const list = kind === 'chat' ? appState.chatConversations : appState.askConversations;
+            const idx = list.findIndex(c => c.id === id);
+            if (idx >= 0) list[idx] = { id, ...record }; else list.unshift({ id, ...record });
+            renderConversationList(kind);
+        }
+
         // ---------- Ask A.D.A.M (General Q&A) ----------
         async function sendAskMessage() {
             if (appState.readOnly) return;
@@ -1330,13 +1580,9 @@
             setBusy(btn, true);
 
             const container = document.getElementById('ask-messages');
-            container.innerHTML += `
-                <div class="flex gap-3 justify-end">
-                    <div class="bg-red-600/20 border border-red-500/30 rounded-2xl p-4 text-white max-w-2xl">${renderInline(msg)}</div>
-                </div>`;
+            container.innerHTML += bubbleHtml({ role: 'user', content: msg });
 
             appState.askChatHistory.push({ role: 'user', content: msg });
-            persistChats();
             input.value = '';
             container.scrollTop = container.scrollHeight;
             const typingId = appendTypingBubble(container);
@@ -1345,7 +1591,6 @@
 
             const response = await callAiEngine(withHistory(appState.askChatHistory, msg), generalMentorPrompt);
             appState.askChatHistory.push({ role: 'assistant', content: response.text });
-            persistChats();
             removeTypingBubble(typingId);
 
             container.innerHTML += `
@@ -1354,19 +1599,8 @@
                     <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 text-slate-200 max-w-3xl">${renderRichText(response.text)}${providerTag(response.provider)}</div>
                 </div>`;
             container.scrollTop = container.scrollHeight;
+            await saveConversation('ask');
             setBusy(btn, false);
-        }
-
-        function clearAskChat() {
-            document.getElementById('ask-messages').innerHTML = `
-                <div class="flex gap-3">
-                    <div class="w-8 h-8 rounded-xl bg-red-600/10 border border-red-500/20 flex items-center justify-center text-red-500 shrink-0"><i class="fa-solid fa-robot"></i></div>
-                    <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 text-slate-200 max-w-3xl leading-relaxed">
-                        <strong>Session reset.</strong> What would you like to know about Oracle architecture or best practices?
-                    </div>
-                </div>`;
-            appState.askChatHistory = [];
-            persistChats();
         }
 
         // ---------- Guided Investigation Chat Functions (Senior Human DBA Persona) ----------
@@ -1374,33 +1608,32 @@
             if (appState.readOnly) return;
             const input = document.getElementById('chat-input');
             let msg = input.value.trim();
-            if (!msg && !appState.attachedFileContent) return;
+            const imageAttached = appState.attachedImageData;
+            if (!msg && !appState.attachedFileContent && !imageAttached) return;
             const btn = document.getElementById('chat-send-btn');
             setBusy(btn, true);
 
+            let historyMsg = msg;
             if (appState.attachedFileContent) {
-                msg += `\n\n[Attached File (${appState.attachedFileName})]:\n` + appState.attachedFileContent;
+                historyMsg += `\n\n[Attached File (${appState.attachedFileName})]:\n` + appState.attachedFileContent;
+            } else if (imageAttached) {
+                historyMsg = (msg ? msg + '\n' : '') + `[Image attached: ${appState.attachedFileName}]`;
             }
 
             const container = document.getElementById('chat-messages');
-            container.innerHTML += `
-                <div class="flex gap-3 justify-end">
-                    <div class="bg-red-600/20 border border-red-500/30 rounded-2xl p-4 text-white max-w-2xl">${renderInline(msg)}</div>
-                </div>`;
-            
-            appState.chatHistory.push({ role: 'user', content: msg });
-            persistChats();
+            container.innerHTML += bubbleHtml({ role: 'user', content: msg, image: imageAttached ? imageAttached.dataUrl : null });
+
+            appState.chatHistory.push({ role: 'user', content: historyMsg });
             input.value = '';
             removeAttachment();
             container.scrollTop = container.scrollHeight;
             const typingId = appendTypingBubble(container);
 
-            const seniorMentorPrompt = "You are A.D.A.M, an expert, senior Oracle DBA mentor with decades of production enterprise experience (Oracle 19.32-patched 19c & 23ai RAC). Interact like an experienced, supportive senior human colleague. Never give generic, robotic canned responses or bulleted lists of random suggestions. Instead, guide the user step-by-step through their troubleshooting session: talk conversationally, ask probing questions about what they see in their environment, request specific query outputs (like v$session, v$process, ASH, or alert logs) when needed, analyze what they provide, explain the underlying Oracle mechanics calmly, and collaborate closely until you find the exact root cause and resolution. Use fenced ```sql code blocks for any SQL you ask the user to run.";
-            
-            const response = await callAiEngine(withHistory(appState.chatHistory, msg), seniorMentorPrompt);
-            
+            const seniorMentorPrompt = "You are A.D.A.M, an expert, senior Oracle DBA mentor with decades of production enterprise experience (Oracle 19.32-patched 19c & 23ai RAC). Interact like an experienced, supportive senior human colleague. Never give generic, robotic canned responses or bulleted lists of random suggestions. Instead, guide the user step-by-step through their troubleshooting session: talk conversationally, ask probing questions about what they see in their environment, request specific query outputs (like v$session, v$process, ASH, or alert logs) when needed, analyze what they provide (including screenshots), explain the underlying Oracle mechanics calmly, and collaborate closely until you find the exact root cause and resolution. Use fenced ```sql code blocks for any SQL you ask the user to run. Safety is critical: before giving any SQL that writes, deletes, truncates, drops, or changes system or instance configuration (ALTER SYSTEM, DROP, TRUNCATE, GRANT, or UPDATE/DELETE without a narrow WHERE clause), explicitly say in plain text that it is destructive or configuration-changing, explain exactly what it will do, and suggest a safer read-only diagnostic step first whenever one exists. Never present a destructive or configuration-changing statement as routine.";
+
+            const response = await callAiEngine(withHistory(appState.chatHistory, msg || 'Please look at the attached image and help diagnose it.'), seniorMentorPrompt, imageAttached);
+
             appState.chatHistory.push({ role: 'assistant', content: response.text });
-            persistChats();
             removeTypingBubble(typingId);
 
             container.innerHTML += `
@@ -1409,35 +1642,8 @@
                     <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 text-slate-200 max-w-3xl">${renderRichText(response.text)}${providerTag(response.provider)}</div>
                 </div>`;
             container.scrollTop = container.scrollHeight;
+            await saveConversation('chat');
             setBusy(btn, false);
-        }
-
-        function clearChat() {
-            document.getElementById('chat-messages').innerHTML = `
-                <div class="flex gap-3">
-                    <div class="w-8 h-8 rounded-xl bg-red-600/10 border border-red-500/20 flex items-center justify-center text-red-500 shrink-0"><i class="fa-solid fa-robot"></i></div>
-                    <div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 text-slate-200 max-w-3xl leading-relaxed">
-                        <strong>Session reset.</strong> What database issue are we tackling next? Tell me what you're seeing!
-                    </div>
-                </div>`;
-            appState.chatHistory = [];
-            persistChats();
-        }
-
-        // ---------- Chat persistence (survives page refresh) ----------
-        function persistChats() {
-            localStorage.setItem('adam_chat_history', JSON.stringify(appState.chatHistory));
-            localStorage.setItem('adam_ask_chat_history', JSON.stringify(appState.askChatHistory));
-        }
-
-        function renderPersistedChats() {
-            const askContainer = document.getElementById('ask-messages');
-            const chatContainer = document.getElementById('chat-messages');
-            const bubble = (m) => m.role === 'user'
-                ? `<div class="flex gap-3 justify-end"><div class="bg-red-600/20 border border-red-500/30 rounded-2xl p-4 text-white max-w-2xl">${renderInline(m.content)}</div></div>`
-                : `<div class="flex gap-3"><div class="w-8 h-8 rounded-xl bg-red-600/10 border border-red-500/20 flex items-center justify-center text-red-500 shrink-0"><i class="fa-solid fa-robot"></i></div><div class="bg-slate-950 border border-slate-800 rounded-2xl p-4 text-slate-200 max-w-3xl">${renderRichText(m.content)}</div></div>`;
-            if (appState.askChatHistory.length) askContainer.innerHTML += appState.askChatHistory.map(bubble).join('');
-            if (appState.chatHistory.length) chatContainer.innerHTML += appState.chatHistory.map(bubble).join('');
         }
 
         // ---------- UI helpers: busy state, typing indicator, provider tag ----------
@@ -1576,7 +1782,7 @@
             w.document.close();
         }
 
-        // ---------- Multi-Phase DBA Runbooks (built-in + owner-authored, synced via Firebase) ----------
+        // ---------- Multi-Phase DBA Runbooks (built-in + team-authored, synced via Firebase) ----------
         const runbooksData = {
             blocking: {
                 title: "Blocking Session Investigation & Resolution",
@@ -1632,7 +1838,7 @@
                 card.className = 'custom-runbook-card bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4 shadow-xl';
                 card.innerHTML = `<div class="w-10 h-10 rounded-xl bg-${c}-600/10 text-${c}-500 border border-${c}-500/20 flex items-center justify-center"><i class="fa-solid fa-star"></i></div>
                     <h3 class="text-sm font-bold text-white">${escapeHtml(rb.title)}</h3>
-                    <p class="text-xs text-slate-400 leading-relaxed">Custom runbook added by the owner.</p>
+                    <p class="text-xs text-slate-400 leading-relaxed">By ${escapeHtml(rb.author || 'Unknown')} · ${escapeHtml(rb.date || '')}</p>
                     <button onclick="loadRunbookModal('${key}')" class="w-full bg-slate-800 hover:bg-slate-700 text-white text-xs py-2 rounded-xl border border-slate-700 transition-all">Open Runbook</button>`;
                 wrap.appendChild(card);
             });
@@ -1655,23 +1861,111 @@
             `).join('');
         }
 
-        // Simple owner-only runbook editor (prompt-based, keeps this a single file)
-        async function openRunbookEditor() {
-            if (appState.role !== 'owner') return;
-            const title = prompt('Runbook title (e.g. "Listener Down Recovery"):');
-            if (!title) return;
-            const key = 'custom_' + title.toLowerCase().replace(/[^a-z0-9]+/g, '_').slice(0, 40) + '_' + Date.now().toString(36);
-            const phases = [];
-            for (const phaseName of ['Triage', 'Diagnostics', 'Remediation', 'Verification']) {
-                const content = prompt(`${phaseName} — describe this phase (use \`\`\`sql ... \`\`\` for code blocks):`, '');
-                phases.push({ name: phaseName, content: content || '(Not provided)' });
+        // ---------- Runbook editor modal: upload/describe -> AI draft -> preview/edit -> publish (anyone) ----------
+        function loadScriptOnce(src) {
+            return new Promise((resolve, reject) => {
+                if (document.querySelector(`script[src="${src}"]`)) return resolve();
+                const s = document.createElement('script');
+                s.src = src; s.onload = () => resolve(); s.onerror = () => reject(new Error('Failed to load ' + src));
+                document.head.appendChild(s);
+            });
+        }
+
+        async function extractTextFromFile(file) {
+            const name = file.name.toLowerCase();
+            if (name.endsWith('.txt') || name.endsWith('.md')) return await file.text();
+            if (name.endsWith('.pdf')) {
+                await loadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
+                window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                const buf = await file.arrayBuffer();
+                const pdf = await window.pdfjsLib.getDocument({ data: buf }).promise;
+                let text = '';
+                for (let p = 1; p <= Math.min(pdf.numPages, 25); p++) {
+                    const page = await pdf.getPage(p);
+                    const content = await page.getTextContent();
+                    text += content.items.map(it => it.str).join(' ') + '\n';
+                }
+                return text;
             }
-            const rb = { title, phases };
-            const ok = await fbOwner('PUT', 'customRunbooks/' + key, rb);
-            if (ok === null) { alert('Could not save the runbook to the cloud. Check your Firebase connection.'); return; }
+            if (name.endsWith('.docx')) {
+                await loadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js');
+                const buf = await file.arrayBuffer();
+                const result = await window.mammoth.extractRawText({ arrayBuffer: buf });
+                return result.value;
+            }
+            throw new Error('Unsupported file type. Use .txt, .md, .pdf, or .docx.');
+        }
+
+        async function draftRunbookFromText(sourceText) {
+            const prompt = `Source material:\n${sourceText.slice(0, 12000)}\n\nBased on this, draft an Oracle DBA operational runbook with exactly 4 phases: Triage, Diagnostics, Remediation, Verification. Respond with ONLY valid JSON, no markdown fences, no commentary, in exactly this shape: {"title": "...", "phases": [{"name":"Triage","content":"..."},{"name":"Diagnostics","content":"..."},{"name":"Remediation","content":"..."},{"name":"Verification","content":"..."}]}. Use \\n for line breaks and \`\`\`sql fenced blocks for any SQL, all inside the JSON string values.`;
+            const result = await callAiEngine(prompt, 'You are an expert Oracle DBA technical writer. Output strictly valid JSON only, nothing else.');
+            let jsonText = result.text.trim().replace(/^```json\s*/i, '').replace(/^```\s*/, '').replace(/```\s*$/, '');
+            try {
+                const parsed = JSON.parse(jsonText);
+                if (parsed.title && Array.isArray(parsed.phases)) return parsed;
+            } catch (e) { /* fall through to heuristic draft below */ }
+            return {
+                title: 'Draft Runbook (please review and edit)',
+                phases: [
+                    { name: 'Triage', content: 'Review the source material below and fill in the triage steps.' },
+                    { name: 'Diagnostics', content: sourceText.slice(0, 1200) },
+                    { name: 'Remediation', content: 'Add remediation steps here.' },
+                    { name: 'Verification', content: 'Add verification steps here.' }
+                ]
+            };
+        }
+
+        function openRunbookModal() {
+            document.getElementById('runbook-editor-modal').classList.remove('hidden');
+            document.getElementById('runbook-editor-modal').classList.add('flex');
+            document.getElementById('runbook-draft-step').classList.remove('hidden');
+            document.getElementById('runbook-preview-step').classList.add('hidden');
+            document.getElementById('runbook-source-text').value = '';
+            document.getElementById('runbook-source-file').value = '';
+        }
+        function closeRunbookModal() {
+            document.getElementById('runbook-editor-modal').classList.add('hidden');
+            document.getElementById('runbook-editor-modal').classList.remove('flex');
+        }
+
+        async function draftRunbookNow() {
+            const fileInput = document.getElementById('runbook-source-file');
+            const pastedText = document.getElementById('runbook-source-text').value.trim();
+            const btn = document.getElementById('runbook-draft-btn');
+            setBusy(btn, true);
+            try {
+                let sourceText = pastedText;
+                if (fileInput.files[0]) sourceText = await extractTextFromFile(fileInput.files[0]);
+                if (!sourceText || sourceText.trim().length < 10) { alert('Please upload a document or describe the issue in a bit more detail.'); setBusy(btn, false); return; }
+                const draft = await draftRunbookFromText(sourceText);
+                document.getElementById('runbook-preview-title').value = draft.title || 'Untitled Runbook';
+                ['Triage', 'Diagnostics', 'Remediation', 'Verification'].forEach((name) => {
+                    const p = (draft.phases || []).find(ph => ph.name === name) || { content: '' };
+                    document.getElementById('runbook-preview-' + name.toLowerCase()).value = p.content || '';
+                });
+                document.getElementById('runbook-draft-step').classList.add('hidden');
+                document.getElementById('runbook-preview-step').classList.remove('hidden');
+            } catch (e) {
+                alert('Could not process that file: ' + e.message);
+            }
+            setBusy(btn, false);
+        }
+
+        async function publishRunbook() {
+            const title = document.getElementById('runbook-preview-title').value.trim();
+            if (!title) { alert('Give the runbook a title.'); return; }
+            const phases = ['triage', 'diagnostics', 'remediation', 'verification'].map(id => ({
+                name: id.charAt(0).toUpperCase() + id.slice(1),
+                content: document.getElementById('runbook-preview-' + id).value.trim() || '(not provided)'
+            }));
+            const key = 'custom_' + title.toLowerCase().replace(/[^a-z0-9]+/g, '_').slice(0, 40) + '_' + Date.now().toString(36);
+            const rb = { title, phases, author: appState.currentName, date: new Date().toLocaleString() };
+            const ok = await fetch(`${dbBase()}/customRunbooks/${key}.json`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(rb) }).then(r => r.ok).catch(() => false);
+            if (!ok) { alert('Could not publish. Check your connection, or the Firebase rule for customRunbooks needs to allow public writes.'); return; }
             appState.customRunbooks[key] = rb;
             renderCustomRunbookCards();
-            alert('Runbook added and synced to your team.');
+            closeRunbookModal();
+            alert('Runbook published! Visible to the whole team with your name and date.');
         }
 
         // Safety Checker
@@ -1785,13 +2079,9 @@
             appState.teamKeys.push({ key: newKey, name, role, requests: 0, tokens: 0, active: true, expires });
             renderTeamKeysTable();
             navigator.clipboard.writeText(newKey);
-            alert(`Key for ${name} (${role}): ${newKey}\n\nCopied. It works immediately on any device. Share the site link and this key.`);
+            alert(`Key for ${name} (${role}): ${newKey}\n\nCopied. It works immediately on any device, but only one device/browser can be signed in with this key at a time. Share the site link and this key.`);
         }
 
-        // Team keys live only in this browser's localStorage (there is no backend),
-        // so a key typed on another device will never match here. An invite link
-        // carries the key itself, so opening it logs the team member in directly
-        // regardless of device or browser.
         function copyInviteLink(key, name) {
             const link = `${window.location.origin}${window.location.pathname}?key=${encodeURIComponent(key)}&name=${encodeURIComponent(name)}`;
             navigator.clipboard.writeText(link);
@@ -1803,32 +2093,13 @@
             alert('Key copied to clipboard!');
         }
 
-        // If this page was opened via an invite link (?key=...), authenticate the
-        // team member directly using the key from the URL, instead of requiring a
-        // local match against this browser's team-key list.
         function checkInviteLink() {
             const params = new URLSearchParams(window.location.search);
             const inviteKey = params.get('key');
             if (!inviteKey) return false;
-
-            const inviteName = params.get('name') ? decodeURIComponent(params.get('name')) : 'Invited Team Member';
-            appState.role = 'team';
-            appState.currentKey = inviteKey;
-            appState.currentName = inviteName;
-
-            let found = appState.teamKeys.find(k => k.key === inviteKey);
-            if (!found) {
-                found = { key: inviteKey, name: inviteName, role: 'Senior DBA Team Member', requests: 0, active: true };
-                appState.teamKeys.push(found);
-            }
-            found.active = true;
-            found.requests = (found.requests || 0) + 1;
-            saveState();
-
-            // Scrub the key out of the visible URL/history once it's been used.
+            document.getElementById('login-key-input').value = inviteKey;
             window.history.replaceState({}, document.title, window.location.origin + window.location.pathname);
-
-            startApp();
+            handleLogin();
             return true;
         }
 
@@ -1898,6 +2169,19 @@
             if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
                 const el = document.getElementById('natural-query-input');
                 if (el && !document.getElementById('auth-screen').classList.contains('hidden') === false) { e.preventDefault(); switchTab('query'); el.focus(); }
+            }
+        });
+
+        // Paste-an-image-into-chat support for Guided Investigation
+        document.getElementById('chat-input').addEventListener('paste', (e) => {
+            const items = e.clipboardData && e.clipboardData.items;
+            if (!items) return;
+            for (const item of items) {
+                if (item.type && item.type.startsWith('image/')) {
+                    const file = item.getAsFile();
+                    if (file) { attachImageFile(file); e.preventDefault(); }
+                    break;
+                }
             }
         });
 
